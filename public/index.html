@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Striker - A better copy of Mole... </title>
+    <style>
+      body {
+        font-family: 'Segoe UI', sans-serif;
+        background-color: #f4f4f8;
+        padding: 40px;
+        color: #333;
+      }
+
+      h1 {
+        font-size: 28px;
+        margin-bottom: 20px;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #3366ff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #254eda;
+      }
+
+      #loading {
+        margin-top: 10px;
+        font-style: italic;
+        color: #777;
+      }
+
+      .result {
+        margin-top: 20px;
+        white-space: pre-wrap;
+        border: 1px solid #ccc;
+        padding: 15px;
+        background: white;
+        border-radius: 4px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      }
+
+      #screenshot {
+        margin-top: 20px;
+        max-width: 100%;
+        border: 1px solid #ccc;
+        display: none;
+        border-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Striker - A better copy of Mole... </h1>
+    <input type="text" id="url" placeholder="Enter website URL" style="width: 100%; padding: 10px;" />
+    <button onclick="submitUrl()">Review Site</button>
+    <div id="loading" style="display:none;">⏳ Reviewing...</div>
+    <div class="result" id="review"></div>
+    <div class="result" id="scores" style="margin-top: 10px; display: none;"></div>
+    <div style="margin-top: 20px;">
+      <img id="screenshot" style="max-width: 100%; border: 1px solid #ccc; display: none; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+    </div>
+
+    <script>
+      function getStructureTags(htmlContent) {
+        const tags = [];
+        if (!htmlContent.includes('&lt;footer')) tags.push('missing-footer');
+        if (!htmlContent.includes('&lt;nav')) tags.push('missing-nav');
+        if ((htmlContent.match(/&lt;div/g) || []).length > 30) tags.push('too-many-divs');
+        if (!htmlContent.includes('&lt;main')) tags.push('missing-main');
+        if (!htmlContent.includes('&lt;header')) tags.push('missing-header');
+        return tags;
+      }
+
+      async function submitUrl() {
+        const url = document.getElementById('url').value;
+        if (!url) return;
+
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('review').textContent = '';
+        const img = document.getElementById('screenshot');
+        img.src = '';
+        img.style.display = 'none';
+
+        const response = await fetch('/review', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url }),
+        });
+
+        const data = await response.json();
+        document.getElementById('loading').style.display = 'none';
+
+        if (data.review) {
+          document.getElementById('review').textContent = data.review;
+          const structureTags = getStructureTags(data.html || '');
+          if (structureTags.length > 0) {
+            const tagBox = document.createElement('div');
+            tagBox.style.marginTop = '10px';
+            tagBox.innerHTML = `<strong>🏷️ Structure Tags:</strong> ${structureTags.map(tag => `<span style="background:#eee;padding:3px 6px;border-radius:4px;margin-right:5px;">${tag}</span>`).join(' ')}`;
+            document.getElementById('review').appendChild(tagBox);
+          }
+          const scoreBox = document.getElementById('scores');
+          if (data.scores) {
+            scoreBox.innerHTML = `
+              <strong>Score Breakdown:</strong><br/>
+              🎨 Visual Design: ${data.scores.visual_design}/5<br/>
+              🧭 Usability: ${data.scores.usability}/5<br/>
+              💡 Clarity of Purpose: ${data.scores.clarity_of_purpose}/5
+            `;
+            scoreBox.style.display = 'block';
+          } else {
+            scoreBox.style.display = 'none';
+          }
+          if (data.gif) {
+            img.src = data.gif;
+            img.style.display = 'block';
+          } else {
+            img.style.display = 'none';
+            img.src = '';
+          }
+        } else {
+          document.getElementById('review').textContent = '❌ Error: ' + (data.error || 'Unknown error');
+        }
+      }
+
+      async function loadRecentReviews() {
+        const res = await fetch('/history');
+        const entries = await res.json();
+        const list = document.getElementById('history');
+        list.innerHTML = '';
+
+        entries.forEach(({ url, created_at, gif_url }) => {
+          if (url) {
+            const li = document.createElement('li');
+            const date = new Date(created_at).toLocaleString();
+            const anchor = document.createElement('a');
+            anchor.href = '#';
+            anchor.onclick = () => reviewFromHistory(url);
+            anchor.textContent = url;
+            li.appendChild(anchor);
+
+            const span = document.createElement('span');
+            span.textContent = ` (${date})`;
+            span.style.color = '#888';
+            span.style.fontSize = '12px';
+            li.appendChild(span);
+
+            if (gif_url) {
+              const img = document.createElement('img');
+              img.src = gif_url;
+              img.style.maxWidth = '300px';
+              img.style.marginTop = '5px';
+              img.style.borderRadius = '4px';
+              li.appendChild(document.createElement('br'));
+              li.appendChild(img);
+            }
+
+            list.appendChild(li);
+          }
+        });
+      }
+
+      function reviewFromHistory(url) {
+        document.getElementById('url').value = url;
+        submitUrl();
+      }
+
+    </script>
+  </body>
+</html>
