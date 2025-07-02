@@ -100,13 +100,16 @@
     ::selection {
       background: #ffe3e8;
     }
+    ul#reviews-list li {
+      word-wrap: break-word;
+    }
   </style>
 </head>
 <body>
   <h1>Striker</h1>
   <div style="margin-bottom: 30px; text-align: center;">
     <button onclick="window.location.href='/'" style="width:auto;display:inline-block;margin:5px;background-color:#ec3750;border-color:#ec3750;">Home</button>
-    <button onclick="window.location.href='/history'" style="width:auto;display:inline-block;margin:5px;background-color:#ec3750;border-color:#ec3750;">View History JSON</button>
+    <button onclick="window.location.href='/api/recent-reviews'" style="width:auto;display:inline-block;margin:5px;background-color:#ec3750;border-color:#ec3750;">View History JSON</button>
   </div>
   <input type="text" id="url" placeholder="Enter website URL" />
   <button onclick="submitUrl()">Review Site</button>
@@ -115,7 +118,7 @@
   <img id="screenshot" />
 
   <h2>Recent Reviews</h2>
-  <ul id="history"></ul>
+  <ul id="reviews-list"></ul>
 
   <script>
     async function submitUrl() {
@@ -134,58 +137,30 @@
         body: JSON.stringify({ urls: [url] }),
       });
 
-      const data = await response.json();
+      const text = await response.text();
       document.getElementById('loading').style.display = 'none';
 
-      if (data.results && data.results.length) {
-        let output = '';
-        data.results.forEach(r => {
-          output += `🧠 <strong>${r.finalDecision}</strong>${r.combinedReasons ? ' - ' + r.combinedReasons : ''}<br/>`;
-          if (r.html_snapshot) {
-            output += `<div style="background:#f9f9f9;border:1px solid #ddd;padding:8px;margin:8px 0;max-height:150px;overflow:auto;font-size:14px;">${r.html_snapshot.slice(0,300)}...</div>`;
-          }
-          if (r.screenshot_base64) {
-            output += `<img src="data:image/png;base64,${r.screenshot_base64}" style="max-width:100%;border-radius:8px;margin-top:10px;box-shadow:0 2px 8px rgba(0,0,0,0.1);"/>`;
-          }
-        });
-        document.getElementById('review').innerHTML = output;
-        img.src = '';
-        img.style.display = 'none';
-      } else {
-        document.getElementById('review').textContent = '❌ Error: ' + (data.error || 'Unknown error');
-      }
+      document.getElementById('review').innerHTML = text;
+      loadRecentReviews();
     }
 
     async function loadRecentReviews() {
-      const res = await fetch('/history');
-      const entries = await res.json();
-      const list = document.getElementById('history');
+      const res = await fetch('/api/recent-reviews');
+      const reviews = await res.json();
+
+      const list = document.getElementById('reviews-list');
       list.innerHTML = '';
-
-      entries.forEach(({ url, created_at }) => {
-        if (url) {
+      if (reviews.length === 0) {
+        list.innerHTML = '<li>No recent reviews yet.</li>';
+      } else {
+        reviews.forEach(review => {
           const li = document.createElement('li');
-          const date = new Date(created_at).toLocaleString();
-          const anchor = document.createElement('a');
-          anchor.href = '#';
-          anchor.onclick = () => reviewFromHistory(url);
-          anchor.textContent = url;
-          li.appendChild(anchor);
-
-          const span = document.createElement('span');
-          span.textContent = ` (${date})`;
-          span.style.color = '#888';
-          span.style.fontSize = '12px';
-          li.appendChild(span);
-
+          li.textContent = `[${new Date(review.created_at).toLocaleString()}] URL: ${review.url} ➜ ${review.review}`;
+          if (review.review.includes('APPROVED')) li.style.color = 'green';
+          if (review.review.includes('DENIED')) li.style.color = 'red';
           list.appendChild(li);
-        }
-      });
-    }
-
-    function reviewFromHistory(url) {
-      document.getElementById('url').value = url;
-      submitUrl();
+        });
+      }
     }
 
     loadRecentReviews();
