@@ -1,13 +1,14 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import fs from 'fs';
 import express from 'express';
 import dotenv from 'dotenv';
 import fetch from 'node-fetch';
 import { chromium } from 'playwright';
 import { createClient } from '@supabase/supabase-js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
@@ -19,22 +20,41 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY
 console.log('✅ Server starting...');
 
 
+async function safePageEvaluate(page, script, defaultValue = null) {
+  try {
+    return await page.evaluate(script);
+  } catch (e) {
+    console.log('⚠️ Safe evaluate failed:', e.message);
+    return defaultValue;
+  }
+}
+
+async function safeElementAction(element, action, ...args) {
+  try {
+    await element[action](...args);
+    return true;
+  } catch (e) {
+    console.log(`⚠️ Could not ${action} element:`, e.message);
+    return false;
+  }
+}
+
 app.post('/review', async (req, res) => {
   const { url } = req.body;
   if (!url) return res.status(400).json({ error: 'No URL provided' });
 
-  const browser = await chromium.launch();
+  const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
 
   try {
-    await page.goto(url, { waitUntil: 'networkidle', timeout: 10000 });
+    await page.goto(url, { waitUntil: 'networkidle', timeout: 15000 });
     await page.waitForTimeout(2000);
     const html = await page.content();
 
     const screenshot = await page.screenshot({ type: 'png', fullPage: true });
     const screenshotBase64 = screenshot.toString('base64');
 
-    await supabase.from('reviews').insert([
+    const { error: insertError } = await supabase.from('reviews').insert([
       {
         url,
         review: 'SINGLE REVIEW - APPROVED (basic load)',
@@ -46,6 +66,10 @@ app.post('/review', async (req, res) => {
         created_at: new Date().toISOString()
       }
     ]);
+
+    if (insertError) {
+      console.error('❌ Supabase Insert Error:', insertError.message);
+    }
 
     console.log(`✅ Single site review stored for ${url}`);
     res.json({ url, screenshot_base64: screenshotBase64, html: html.substring(0, 3000) });
@@ -62,238 +86,210 @@ app.post('/batch-review', async (req, res) => {
   if (!urls || !Array.isArray(urls)) return res.status(400).json({ error: 'No URLs array provided' });
 
   const results = [];
-  const browser = await chromium.launch();
+  const browser = await chromium.launch({ headless: true });
 
   try {
     for (const url of urls) {
-      let retries = 0;
+      console.log(`🔍 Testing ${url}...`);
       let success = false;
-      while (retries < 3 && !success) {
+      let attempts = 0;
+      const maxAttempts = 3;
+
+      while (!success && attempts < maxAttempts) {
+        attempts++;
         const page = await browser.newPage();
-       
-        await page.addInitScript(() => {
-          window.require = () => ({});
-          window.module = { exports: {} };
-        });
 
         const consoleIssues = [];
+        const failedRequests = [];
+        const failedAPICalls = [];
+
+
         page.on('pageerror', error => {
-          if (error.message.includes('require is not defined')) {
-            console.log('⚠️ Ignored page error:', error.message);
-          } else {
+          if (!error.message.includes('require is not defined')) {
             consoleIssues.push(`[pageerror] ${error.message}`);
           }
         });
 
-        try {
-          page.on('console', msg => {
-            if (['error', 'warning'].includes(msg.type())) {
-              if (!msg.text().includes('require is not defined')) {
-                consoleIssues.push(`[${msg.type()}] ${msg.text()}`);
-              } else {
-                console.log(`⚠️ Ignored console error: ${msg.text()}`);
-              }
-            }
-          });
-
-          const failedRequests = [];
-          page.on('requestfailed', request => {
-            failedRequests.push(`${request.url()} - ${request.failure()?.errorText}`);
-          });
-
-          const failedAPICalls = [];
-          page.on('response', async response => {
-            if (!response.ok()) {
-              failedAPICalls.push(`${response.url()} - HTTP ${response.status()}`);
-            }
-          });
-
-          let response;
-          try {
-            response = await page.goto(url, { waitUntil: 'networkidle', timeout: 10000 });
-          } catch (e) {
-            if (e.message.includes('require is not defined')) {
-              console.log('⚠️ Ignored navigation error:', e.message);
-            } else {
-              throw e;
+        page.on('console', msg => {
+          if (['error', 'warning'].includes(msg.type())) {
+            if (!msg.text().includes('require is not defined')) {
+              consoleIssues.push(`[${msg.type()}] ${msg.text()}`);
             }
           }
+        });
+
+        page.on('requestfailed', request => {
+          failedRequests.push(`${request.url()} - ${request.failure()?.errorText || 'Unknown error'}`);
+        });
+
+        page.on('response', async response => {
+          if (!response.ok() && response.status() >= 400) {
+            failedAPICalls.push(`${response.url()} - HTTP ${response.status()}`);
+          }
+        });
+
+        try {
+
+          const response = await page.goto(url, { 
+            waitUntil: 'networkidle', 
+            timeout: 15000 
+          });
+          
           await page.waitForTimeout(2000);
-          const status = response?.status();
+          
+          const status = response?.status() || 0;
           let interactivityFailed = false;
           let interactivityReasons = [];
 
-          if (status && status >= 400) {
+
+          if (status >= 400) {
             interactivityFailed = true;
             interactivityReasons.push(`HTTP status code ${status}`);
           }
 
           const htmlBefore = await page.content();
 
-          // scroll to bottom repeatedly until no more height change
-          let lastHeight = await page.evaluate(() => {
-            try { return document.body.scrollHeight; } catch (e) { return 0; }
-          });
-          while (true) {
-            await page.evaluate(() => {
-              try { window.scrollTo(0, document.body.scrollHeight); } catch (e) {}
+          // scroll
+          await page.evaluate(() => {
+            return new Promise((resolve) => {
+              let totalHeight = 0;
+              const distance = 100;
+              const timer = setInterval(() => {
+                const scrollHeight = document.body.scrollHeight;
+                window.scrollBy(0, distance);
+                totalHeight += distance;
+
+                if (totalHeight >= scrollHeight) {
+                  clearInterval(timer);
+                  resolve();
+                }
+              }, 100);
             });
-            await page.waitForTimeout(1000);
-            let newHeight = await page.evaluate(() => {
-              try { return document.body.scrollHeight; } catch (e) { return 0; }
-            });
-            if (newHeight === lastHeight) break;
-            lastHeight = newHeight;
-          }
-
-          // additional checks
-          const imagesCount = await page.$$eval('img', imgs => imgs.length);
-          if (imagesCount < 1) {
-            interactivityFailed = true;
-            interactivityReasons.push('No images found on page.');
-          }
-
-          const hasTextContent = await page.$eval('h1, h2, p', el => el.textContent.length > 0).catch(() => false);
-          if (!hasTextContent) {
-            interactivityFailed = true;
-            interactivityReasons.push('No headings or paragraphs with text found.');
-          }
-
-          const pageText = await page.evaluate(() => {
-            try { return document.body.innerText; } catch (e) { return ''; }
           });
-          if (/404|not found|error/i.test(pageText)) {
-            interactivityFailed = true;
-            interactivityReasons.push('Page text contains 404 or error.');
-          }
 
-          const hasLoginForm = await page.$('form#login') !== null;
-          if (!hasLoginForm) {
-            interactivityFailed = true;
-            interactivityReasons.push('Missing <form id="login"> on page.');
-          }
-          const containsWelcome = await page.evaluate(() => {
-            try { return document.body.innerText.includes('Welcome'); } catch (e) { return false; }
+          await page.waitForTimeout(1500);
+
+
+          const pageMetrics = await page.evaluate(() => {
+            const images = document.querySelectorAll('img').length;
+            const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6').length;
+            const paragraphs = document.querySelectorAll('p').length;
+            const bodyText = document.body.innerText || '';
+            const title = document.title || '';
+            const hasLoginForm = !!document.querySelector('form#login, form[action*="login"], input[type="password"]');
+            
+            return {
+              images,
+              headings,
+              paragraphs,
+              bodyText: bodyText.substring(0, 500),
+              title,
+              hasLoginForm,
+              containsWelcome: bodyText.toLowerCase().includes('welcome'),
+              hasErrorIndicators: /404|not found|error|oops/i.test(bodyText + ' ' + title)
+            };
           });
-          if (!containsWelcome) {
+
+          if (pageMetrics.images < 1 && pageMetrics.headings < 1 && pageMetrics.paragraphs < 1) {
             interactivityFailed = true;
-            interactivityReasons.push('Page does not contain text "Welcome".');
+            interactivityReasons.push('Page appears to have minimal content');
           }
 
-          // click
-          const clickables = await page.$$('a, button, input[type="submit"], [role="button"], [onclick]');
-          for (const el of clickables) {
-            try {
-              await el.click();
+          if (pageMetrics.hasErrorIndicators) {
+            interactivityFailed = true;
+            interactivityReasons.push('Page contains error indicators');
+          }
+
+          // element testing
+          const clickables = await page.$$('a:not([href="#"]), button:not([disabled]), input[type="submit"]:not([disabled]), [role="button"]:not([disabled])');
+          let clickedElements = 0;
+          
+          for (const el of clickables.slice(0, 5)) { // clickable
+            const clicked = await safeElementAction(el, 'click');
+            if (clicked) {
+              clickedElements++;
               await page.waitForTimeout(500);
-              await el.click();
-              await page.waitForTimeout(1000);
-            } catch (e) {
-              console.log('⚠️ Could not click element:', e.message);
             }
           }
 
-          const inputs = await page.$$('input[type="text"], input:not([type])');
-          for (const input of inputs) {
-            try {
-              await input.type('Hack Club Test Input');
-              await page.waitForTimeout(500);
-            } catch (e) {
-              console.log('⚠️ Could not type into input:', e.message);
-            }
+          // forms
+          const textInputs = await page.$$('input[type="text"], input[type="email"], input:not([type]), textarea');
+          for (const input of textInputs.slice(0, 3)) { // Limit to first 3 inputs
+            await safeElementAction(input, 'fill', 'Hack Club Test Input');
+            await page.waitForTimeout(300);
           }
 
-          // Select dropdowns
+          // dropdown
           const selects = await page.$$('select');
-          for (const sel of selects) {
+          for (const select of selects.slice(0, 2)) { 
             try {
-              const options = await sel.$$('option');
+              const options = await select.$$('option');
               if (options.length > 1) {
-                await sel.selectOption({ index: 1 });
-                await page.waitForTimeout(1000);
+                await select.selectOption({ index: 1 });
+                await page.waitForTimeout(500);
               }
             } catch (e) {
-              console.log('⚠️ Could not select dropdown:', e.message);
+              console.log('⚠️ Could not interact with dropdown:', e.message);
             }
           }
 
-          // submit forms
-          const forms = await page.$$('form');
-          for (const form of forms) {
-            try {
-              await form.evaluate(f => f.submit());
-              await page.waitForTimeout(1000);
-            } catch (e) {
-              console.log('⚠️ Could not submit form:', e.message);
-            }
-          }
-
-          //  scrioll
-          await page.evaluate(() => { try { window.scrollTo(0, 0); } catch (e) {} });
+          
           await page.waitForTimeout(1000);
-
-          const newContentAppeared = await page.$('h2, h3, .card, .result, .pokemon-name, .list-item');
-          if (!newContentAppeared) {
-            interactivityFailed = true;
-            interactivityReasons.push('Dropdowns or buttons did not produce new visible content.');
-          }
-
           const htmlAfter = await page.content();
+          
+          
+          await page.evaluate(() => window.scrollTo(0, 0));
+          await page.waitForTimeout(500);
 
-          if (htmlBefore === htmlAfter) {
+         
+          const newContentAppeared = await page.$('.card, .result, .list-item, .dynamic-content, [data-testid]') !== null;
+
+          
+          if (htmlBefore === htmlAfter && clickedElements === 0) {
             interactivityFailed = true;
-            interactivityReasons.push('Page content did not change after interacting.');
+            interactivityReasons.push('No content changes detected after interactions');
           }
 
-          const title = await page.title();
-          if (/404|not found|error/i.test(title)) {
+          if (failedRequests.length > 5) {
             interactivityFailed = true;
-            interactivityReasons.push(`Page title indicates error: "${title}"`);
+            interactivityReasons.push(`Too many failed requests: ${failedRequests.length}`);
           }
 
-          if (consoleIssues.length > 0) {
-            console.log(`📝 Console issues (ignored for pass/fail): ${consoleIssues.join('; ')}`);
-          }
-
-          if (failedRequests.length > 0) {
+          if (failedAPICalls.length > 3) { 
             interactivityFailed = true;
-            interactivityReasons.push('Failed static requests: ' + failedRequests.join('; '));
+            interactivityReasons.push(`Multiple API failures: ${failedAPICalls.length}`);
           }
 
-          if (failedAPICalls.length > 0) {
-            interactivityFailed = true;
-            interactivityReasons.push('Failed API calls: ' + failedAPICalls.join('; '));
-          }
+          // AI Review
+          const prompt = `You are an automated website reviewer for Hack Club projects. Analyze this webpage and determine if it successfully loads and functions without critical errors.
 
-          const html = htmlAfter;
-
-          if (interactivityFailed) {
-            const failScreenshot = await page.screenshot({ type: 'png', fullPage: true });
-            const failPath = `fail-${encodeURIComponent(url)}.png`;
-            require('fs').writeFileSync(failPath, failScreenshot);
-            console.log(`📸 Saved failure screenshot: ${failPath}`);
-          }
-
-          const prompt = `You are an automated reviewer. Given this webpage content, decide only if the site successfully loads in a browser without any obvious errors. 
-It does not matter if the page has minimal content, or uses JavaScript frameworks with sparse HTML—if it loads and does not show an error page, APPROVE it.
+APPROVAL CRITERIA:
+- Page loads without critical errors
+- Has basic content (text, images, or interactive elements)
+- Not showing 404/error pages
+- Basic functionality appears to work
 
 Respond exactly with:
-
 RESULT: APPROVED
-
 or
-
 RESULT: DENIED
-REASON: [short reason]
+REASON: [brief reason]
 
-HTML:
-${html.substring(0, 10000)}`;
+Page Title: ${pageMetrics.title}
+Page Status: HTTP ${status}
+Content Summary: ${pageMetrics.headings} headings, ${pageMetrics.paragraphs} paragraphs, ${pageMetrics.images} images
+Has Interactive Elements: ${clickedElements > 0 ? 'Yes' : 'No'}
+Error Indicators: ${pageMetrics.hasErrorIndicators ? 'Yes' : 'No'}
 
-          const decisions = [];
+HTML Sample:
+${htmlAfter.substring(0, 8000)}`;
 
-          // Openai
-          {
-            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          let finalDecision = 'APPROVED';
+          let aiReason = null;
+          let aiRawResponse = '';
+
+          try {
+            const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -302,70 +298,91 @@ ${html.substring(0, 10000)}`;
               body: JSON.stringify({
                 model: 'gpt-4o',
                 messages: [{ role: 'user', content: prompt }],
+                max_tokens: 150,
+                temperature: 0.1
               }),
             });
 
-            const data = await response.json();
-            const raw = data.choices?.[0]?.message?.content.trim() || '';
-            let decision = 'DENIED';
-            let reason = null;
-
-            if (/RESULT:\s*APPROVED/i.test(raw)) {
-              decision = 'APPROVED';
-            } else if (/RESULT:\s*DENIED/i.test(raw)) {
-              decision = 'DENIED';
-              const match = raw.match(/REASON:\s*(.+)/i);
-              reason = match ? match[1].trim() : 'No reason provided';
-            }
-
-            if (interactivityFailed) {
-              decision = 'DENIED';
-              reason = interactivityReasons.join(' | ');
-            }
-
-            console.log(`✅ [OpenAI] Decision for ${url}: ${decision}${reason ? ' - ' + reason : ''}`);
-
-            decisions.push({ model: 'openai-gpt-4o', decision, reason, raw });
-
-            const finalDecision = decision;
-            const combinedReasons = reason ? `OpenAI: ${reason}` : null;
-
-            const screenshot = await page.screenshot({ type: 'png', fullPage: true });
-            const screenshotBase64 = screenshot.toString('base64');
-
-            console.log(`🏁 Final decision for ${url}: ${finalDecision}${combinedReasons ? ' - ' + combinedReasons : ''}`);
-
-            const { error: insertError } = await supabase.from('reviews').insert([
-              {
-                url,
-                review: finalDecision === 'APPROVED' ? 'APPROVED' : `DENIED: ${combinedReasons}`,
-                html_snapshot: html.substring(0, 3000),
-                ai_raw_response: JSON.stringify([{ model: 'openai-gpt-4o', decision, reason, raw }]),
-                model_used: 'openai-gpt-4o',
-                screenshot_base64: screenshotBase64,
-                gif_base64: null,
-                created_at: new Date().toISOString()
+            if (openaiResponse.ok) {
+              const data = await openaiResponse.json();
+              aiRawResponse = data.choices?.[0]?.message?.content?.trim() || '';
+              
+              if (/RESULT:\s*APPROVED/i.test(aiRawResponse)) {
+                finalDecision = 'APPROVED';
+              } else if (/RESULT:\s*DENIED/i.test(aiRawResponse)) {
+                finalDecision = 'DENIED';
+                const match = aiRawResponse.match(/REASON:\s*(.+)/i);
+                aiReason = match ? match[1].trim() : 'No reason provided';
               }
-            ]);
-            if (insertError) {
-              console.error(`❌ Supabase Insert Error for ${url}:`, insertError.message);
             } else {
-              console.log(`📝 Stored final decision for ${url} with OpenAI`);
+              console.error('❌ OpenAI API Error:', openaiResponse.status);
+              finalDecision = 'DENIED';
+              aiReason = 'AI review failed';
             }
-
-            results.push({ url, finalDecision, combinedReasons, decisions: [{ model: 'openai-gpt-4o', decision, reason, raw }], screenshot_base64: screenshotBase64 });
+          } catch (aiError) {
+            console.error('❌ AI Review Error:', aiError.message);
+            finalDecision = 'DENIED';
+            aiReason = 'AI review error';
           }
+
+
+          if (interactivityFailed) {
+            finalDecision = 'DENIED';
+            aiReason = interactivityReasons.join(' | ');
+          }
+
+
+          const screenshot = await page.screenshot({ type: 'png', fullPage: true });
+          const screenshotBase64 = screenshot.toString('base64');
+
+          if (finalDecision === 'DENIED') {
+            const failPath = `fail-${Date.now()}-${encodeURIComponent(url.replace(/[^a-zA-Z0-9]/g, '_'))}.png`;
+            fs.writeFileSync(failPath, screenshot);
+            console.log(`📸 Saved failure screenshot: ${failPath}`);
+          }
+
+
+          const reviewText = finalDecision === 'APPROVED' ? 'APPROVED' : `DENIED: ${aiReason}`;
+          const { error: insertError } = await supabase.from('reviews').insert([
+            {
+              url,
+              review: reviewText,
+              html_snapshot: htmlAfter.substring(0, 3000),
+              ai_raw_response: JSON.stringify({ decision: finalDecision, reason: aiReason, raw: aiRawResponse }),
+              model_used: 'openai-gpt-4o',
+              screenshot_base64: screenshotBase64,
+              gif_base64: null,
+              created_at: new Date().toISOString()
+            }
+          ]);
+
+          if (insertError) {
+            console.error(`❌ Supabase Insert Error for ${url}:`, insertError.message);
+          }
+
+          console.log(`✅ [${finalDecision}] ${url}${aiReason ? ' - ' + aiReason : ''}`);
+          
+          results.push({
+            url,
+            finalDecision,
+            combinedReasons: aiReason,
+            decisions: [{ model: 'openai-gpt-4o', decision: finalDecision, reason: aiReason, raw: aiRawResponse }],
+            screenshot_base64: screenshotBase64
+          });
+
           success = true;
+
         } catch (err) {
-          retries++;
-          console.log(`⚠️ Attempt #${retries} failed for ${url}: ${err.message}`);
-          await page.waitForTimeout(2000 * retries);
-          if (retries === 3) {
-            console.error(`🚨 Gave up on ${url} after 3 attempts.`);
+          console.log(`⚠️ Attempt ${attempts}/${maxAttempts} failed for ${url}: ${err.message}`);
+          
+          if (attempts === maxAttempts) {
+            console.error(`🚨 Failed to test ${url} after ${maxAttempts} attempts`);
+            
+          
             const { error: insertError } = await supabase.from('reviews').insert([
               {
                 url,
-                review: 'DENIED: Failed to load page',
+                review: `DENIED: Failed to load - ${err.message}`,
                 html_snapshot: null,
                 ai_raw_response: null,
                 model_used: 'none',
@@ -374,16 +391,20 @@ ${html.substring(0, 10000)}`;
                 created_at: new Date().toISOString()
               }
             ]);
+
             if (insertError) {
               console.error(`❌ Supabase Insert Error for ${url}:`, insertError.message);
             }
+
             results.push({
               url,
               finalDecision: 'DENIED',
-              combinedReasons: 'Failed to load page: ' + err.message,
+              combinedReasons: `Failed to load: ${err.message}`,
               decisions: [],
               screenshot_base64: null
             });
+          } else {
+            await page.waitForTimeout(2000 * attempts);
           }
         } finally {
           await page.close();
@@ -391,15 +412,24 @@ ${html.substring(0, 10000)}`;
       }
     }
 
-    let summary = results.map(r => {
-      return `\n🔗 ${r.url}\n   ➜ Decision: ${r.finalDecision}${r.combinedReasons ? ' - ' + r.combinedReasons : ''}`;
-    }).join('\n');
-    console.log(summary);
+
+    const summary = results.map(r => 
+      `🔗 ${r.url}\n   ➜ ${r.finalDecision}${r.combinedReasons ? ' - ' + r.combinedReasons : ''}`
+    ).join('\n\n');
+
     const total = results.length;
     const passed = results.filter(r => r.finalDecision === 'APPROVED').length;
     const failed = total - passed;
-    console.log(`\n✅ SUMMARY: ${passed}/${total} passed, ${failed} failed.`);
-    res.send(summary);
+
+    const finalSummary = `${summary}\n\n✅ SUMMARY: ${passed}/${total} passed, ${failed} failed.`;
+    console.log(finalSummary);
+    
+    res.json({
+      summary: finalSummary,
+      results,
+      stats: { total, passed, failed }
+    });
+
   } catch (err) {
     console.error('❌ BATCH REVIEW ERROR:', err);
     res.status(500).json({ error: 'Batch review failed', details: err.message });
@@ -408,34 +438,36 @@ ${html.substring(0, 10000)}`;
   }
 });
 
-
-
 app.use(express.static('public'));
 
 // Recent reviews API endpoint
 app.get('/api/recent-reviews', async (req, res) => {
-  const { data, error } = await supabase
-    .from('reviews')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(5);
+  try {
+    const { data, error } = await supabase
+      .from('reviews')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(10);
 
-  if (error) {
-    console.error('❌ Error fetching recent reviews:', error.message);
-    return res.status(500).json({ error: error.message });
+    if (error) {
+      console.error('❌ Error fetching recent reviews:', error.message);
+      return res.status(500).json({ error: error.message });
+    }
+
+    res.json(data || []);
+  } catch (err) {
+    console.error('❌ API Error:', err);
+    res.status(500).json({ error: 'Failed to fetch reviews' });
   }
-
-  res.json(data);
 });
-
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(3000, () => {
-  console.log('Striker is running at http://localhost:3000');
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🚀 Striker is running at http://localhost:${PORT}`);
 });
-
 
 // by @rushmore

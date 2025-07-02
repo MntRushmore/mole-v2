@@ -1,168 +1,765 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Striker</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Striker - Website Tester</title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    :root {
+      --hc-red: #ec3750;
+      --hc-orange: #ff8c37;
+      --hc-yellow: #f1c40f;
+      --hc-green: #33d6a6;
+      --hc-cyan: #5bc0de;
+      --hc-blue: #338eda;
+      --hc-purple: #a633d6;
+      --hc-dark: #1f2d3d;
+      --hc-slate: #3c4858;
+      --hc-muted: #8492a6;
+      --hc-smoke: #e0e6ed;
+      --hc-snow: #f9fafc;
+      --hc-white: #ffffff;
+    }
+    
     body {
-      font-family: 'SF Pro Display', 'Segoe UI', sans-serif;
-      background: #fafafa;
-      padding: 40px;
-      color: #111;
-      font-size: 18px;
-      max-width: 1000px;
-      margin: auto;
+      font-family: 'Phantom Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--hc-snow);
+      color: var(--hc-dark);
+      line-height: 1.5;
+      font-size: 16px;
     }
-    h1 {
-      font-size: 36px;
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    
+    .header {
+      background: var(--hc-white);
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 32px;
+      border: 1px solid var(--hc-smoke);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    
+    .logo h1 {
+      font-size: 32px;
       font-weight: 800;
-      text-align: center;
-      margin-bottom: 30px;
-      color: #ec3750;
-      letter-spacing: -1px;
+      color: var(--hc-red);
+      margin: 0;
     }
-    h2 {
-      color: #ec3750;
-      font-weight: 700;
-      margin-top: 40px;
-      letter-spacing: -0.5px;
-    }
-    button, input[type="text"] {
-      display: block;
-      width: 100%;
-      padding: 14px;
-      font-size: 18px;
-      margin-bottom: 15px;
+    
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--hc-red);
       border-radius: 8px;
-      border: 2px solid #ec3750;
-      background: white;
-      box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    
+    .subtitle {
+      color: var(--hc-slate);
+      font-size: 18px;
+      margin-bottom: 24px;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    
+    .nav-link {
+      padding: 8px 16px;
+      background: var(--hc-smoke);
+      color: var(--hc-slate);
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 14px;
       transition: all 0.2s ease;
     }
-    button {
-      background-color: #ec3750;
+    
+    .nav-link:hover {
+      background: var(--hc-muted);
       color: white;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      cursor: pointer;
     }
-    button:hover {
-      background-color: #c92a43;
+    
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    
+    @media (max-width: 768px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .panel {
+      background: var(--hc-white);
+      border-radius: 12px;
+      padding: 24px;
+      border: 1px solid var(--hc-smoke);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    
+    .panel-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    
+    .panel-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+    }
+    
+    .single-icon {
+      background: var(--hc-blue);
+      color: white;
+    }
+    
+    .batch-icon {
+      background: var(--hc-purple);
+      color: white;
+    }
+    
+    h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--hc-dark);
+      margin: 0;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: var(--hc-slate);
+      font-size: 14px;
+    }
+    
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid var(--hc-smoke);
+      border-radius: 8px;
+      font-size: 16px;
+      font-family: inherit;
+      transition: border-color 0.2s ease;
+      background: var(--hc-white);
+    }
+    
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--hc-blue);
+    }
+    
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+      font-family: 'SF Mono', Consolas, monospace;
+      font-size: 14px;
+    }
+    
+    .btn {
+      width: 100%;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    
+    .btn-primary {
+      background: var(--hc-red);
+      color: white;
+    }
+    
+    .btn-primary:hover:not(:disabled) {
+      background: #d63447;
       transform: translateY(-1px);
     }
-    .result {
-      margin-top: 25px;
-      white-space: pre-wrap;
-      background: white;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      padding: 20px;
+    
+    .btn-secondary {
+      background: var(--hc-purple);
+      color: white;
     }
-    #loading {
+    
+    .btn-secondary:hover:not(:disabled) {
+      background: #9629c4;
+      transform: translateY(-1px);
+    }
+    
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .loading {
+      display: none;
+      padding: 16px;
       text-align: center;
-      margin-top: 15px;
-      font-style: italic;
-      color: #555;
+      color: var(--hc-muted);
+      font-size: 14px;
     }
-    #screenshot {
-      margin-top: 25px;
+    
+    .loading.show {
+      display: block;
+    }
+    
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--hc-smoke);
+      border-top: 2px solid var(--hc-blue);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 8px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .result {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 8px;
+      font-family: 'SF Mono', Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid var(--hc-smoke);
+      background: var(--hc-snow);
+    }
+    
+    .result.success {
+      border-color: var(--hc-green);
+      background: #f0fdf4;
+    }
+    
+    .result.error {
+      border-color: var(--hc-red);
+      background: #fef2f2;
+    }
+    
+    .screenshot {
+      margin-top: 16px;
       max-width: 100%;
       border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      border: 1px solid var(--hc-smoke);
       display: none;
     }
-    ul#history {
-      padding: 0;
+    
+    .screenshot.show {
+      display: block;
     }
-    ul#history li {
-      margin: 8px 0;
-      list-style: none;
-      padding: 8px;
-      background: #fff;
-      border: 1px solid #eee;
-      border-radius: 6px;
-      transition: background 0.2s;
+    
+    .history-panel {
+      background: var(--hc-white);
+      border-radius: 12px;
+      padding: 24px;
+      border: 1px solid var(--hc-smoke);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
-    ul#history li:hover {
-      background: #fdf2f4;
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
     }
-    a {
-      color: #ec3750;
-      text-decoration: none;
+    
+    .stat {
+      text-align: center;
+      padding: 16px 12px;
+      border-radius: 8px;
+      background: var(--hc-snow);
+      border: 1px solid var(--hc-smoke);
+    }
+    
+    .stat-number {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--hc-dark);
+      display: block;
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: var(--hc-muted);
+      text-transform: uppercase;
       font-weight: 600;
-      transition: color 0.2s;
+      letter-spacing: 0.5px;
     }
-    a:hover {
-      color: #c92a43;
-      text-decoration: underline;
+    
+    .reviews-list {
+      list-style: none;
+      max-height: 400px;
+      overflow-y: auto;
     }
-    ::selection {
-      background: #ffe3e8;
+    
+    .review-item {
+      padding: 12px;
+      margin-bottom: 8px;
+      border-radius: 6px;
+      border-left: 3px solid var(--hc-smoke);
+      background: var(--hc-snow);
+      font-size: 14px;
     }
-    ul#reviews-list li {
-      word-wrap: break-word;
+    
+    .review-item.approved {
+      border-left-color: var(--hc-green);
+      background: #f0fdf4;
+    }
+    
+    .review-item.denied {
+      border-left-color: var(--hc-red);
+      background: #fef2f2;
+    }
+    
+    .review-timestamp {
+      font-size: 12px;
+      color: var(--hc-muted);
+      margin-bottom: 4px;
+    }
+    
+    .review-url {
+      font-weight: 600;
+      color: var(--hc-blue);
+      word-break: break-all;
+      margin-bottom: 4px;
+    }
+    
+    .review-status {
+      font-weight: 500;
+      font-size: 13px;
+    }
+    
+    .approved .review-status {
+      color: var(--hc-green);
+    }
+    
+    .denied .review-status {
+      color: var(--hc-red);
+    }
+    
+    .toast {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 500;
+      font-size: 14px;
+      transform: translateX(400px);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .toast.show {
+      transform: translateX(0);
+    }
+    
+    .toast.success {
+      background: var(--hc-green);
+    }
+    
+    .toast.error {
+      background: var(--hc-red);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--hc-muted);
+    }
+    
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
     }
   </style>
 </head>
 <body>
-  <h1>Striker</h1>
-  <div style="margin-bottom: 30px; text-align: center;">
-    <button onclick="window.location.href='/'" style="width:auto;display:inline-block;margin:5px;background-color:#ec3750;border-color:#ec3750;">Home</button>
-    <button onclick="window.location.href='/api/recent-reviews'" style="width:auto;display:inline-block;margin:5px;background-color:#ec3750;border-color:#ec3750;">View History JSON</button>
+  <div class="container">
+    <div class="header">
+      <div class="logo">
+        <div class="logo-icon">S</div>
+        <h1>Striker</h1>
+      </div>
+      <p class="subtitle">Website Review + Tester</p>
+      <div class="nav-links">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/api/recent-reviews" class="nav-link">Export Data</a>
+        <a href="#" class="nav-link" onclick="clearHistory()">Clear History</a>
+      </div>
+    </div>
+    
+    <div class="main-grid">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-icon single-icon">1</div>
+          <h2>Single Site Test</h2>
+        </div>
+        
+        <div class="form-group">
+          <label for="url">Website URL</label>
+          <input type="text" id="url" placeholder="https://example.com" />
+        </div>
+        
+        <button class="btn btn-primary" onclick="submitSingleUrl()">
+          Test Website
+        </button>
+        
+        <div class="loading" id="single-loading">
+          <div class="spinner"></div>
+          Testing website...
+        </div>
+        
+        <div class="result" id="single-result"></div>
+        <img class="screenshot" id="single-screenshot" />
+      </div>
+      
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-icon batch-icon">*</div>
+          <h2>Batch Testing</h2>
+        </div>
+        
+        <div class="form-group">
+          <label for="batch-urls">Website URLs (one per line)</label>
+          <textarea id="batch-urls" placeholder="https://example1.com&#10;https://example2.com&#10;https://example3.com"></textarea>
+        </div>
+        
+        <button class="btn btn-secondary" onclick="submitBatchUrls()">
+          Test Multiple Sites
+        </button>
+        
+        <div class="loading" id="batch-loading">
+          <div class="spinner"></div>
+          Testing websites...
+        </div>
+        
+        <div class="result" id="batch-result"></div>
+      </div>
+    </div>
+    
+    <div class="history-panel">
+      <h2>Recent Reviews</h2>
+      
+      <div class="stats-grid" id="stats-container" style="display: none;"></div>
+      
+      <ul class="reviews-list" id="reviews-list">
+        <li class="review-item">Loading recent reviews...</li>
+      </ul>
+    </div>
   </div>
-  <input type="text" id="url" placeholder="Enter website URL" />
-  <button onclick="submitUrl()">Review Site</button>
-  <div id="loading" style="display:none;">⏳ Reviewing...</div>
-  <div class="result" id="review"></div>
-  <img id="screenshot" />
 
-  <h2>Recent Reviews</h2>
-  <ul id="reviews-list"></ul>
+  <div class="toast" id="toast"></div>
 
   <script>
-    async function submitUrl() {
-      const url = document.getElementById('url').value;
-      if (!url) return;
+    let allReviews = [];
 
-      document.getElementById('loading').style.display = 'block';
-      document.getElementById('review').textContent = '';
-      const img = document.getElementById('screenshot');
-      img.src = '';
-      img.style.display = 'none';
-
-      const response = await fetch('/batch-review', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ urls: [url] }),
-      });
-
-      const text = await response.text();
-      document.getElementById('loading').style.display = 'none';
-
-      document.getElementById('review').innerHTML = text;
-      loadRecentReviews();
+    function showToast(message, isError = false) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = `toast ${isError ? 'error' : 'success'} show`;
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
     }
 
-    async function loadRecentReviews() {
-      const res = await fetch('/api/recent-reviews');
-      const reviews = await res.json();
+    function showLoading(elementId, show = true) {
+      const element = document.getElementById(elementId);
+      element.classList.toggle('show', show);
+    }
 
-      const list = document.getElementById('reviews-list');
-      list.innerHTML = '';
-      if (reviews.length === 0) {
-        list.innerHTML = '<li>No recent reviews yet.</li>';
-      } else {
-        reviews.forEach(review => {
-          const li = document.createElement('li');
-          li.textContent = `[${new Date(review.created_at).toLocaleString()}] URL: ${review.url} ➜ ${review.review}`;
-          if (review.review.includes('APPROVED')) li.style.color = 'green';
-          if (review.review.includes('DENIED')) li.style.color = 'red';
-          list.appendChild(li);
-        });
+    function clearResult(resultId) {
+      document.getElementById(resultId).textContent = '';
+      document.getElementById(resultId).className = 'result';
+    }
+
+    function setResult(resultId, content, isSuccess = null) {
+      const element = document.getElementById(resultId);
+      element.textContent = content;
+      if (isSuccess !== null) {
+        element.className = `result ${isSuccess ? 'success' : 'error'}`;
       }
     }
 
+    function isValidUrl(string) {
+      try {
+        new URL(string);
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    async function submitSingleUrl() {
+      const urlInput = document.getElementById('url');
+      const url = urlInput.value.trim();
+      
+      if (!url) {
+        showToast('Please enter a URL', true);
+        return;
+      }
+
+      if (!isValidUrl(url)) {
+        showToast('Please enter a valid URL (include http:// or https://)', true);
+        return;
+      }
+
+      clearResult('single-result');
+      showLoading('single-loading', true);
+      
+      const screenshot = document.getElementById('single-screenshot');
+      screenshot.classList.remove('show');
+
+      try {
+        const response = await fetch('/review', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        
+        setResult('single-result', `Review completed for: ${url}\n\nHTML Preview:\n${data.html}`, true);
+        
+        if (data.screenshot_base64) {
+          screenshot.src = `data:image/png;base64,${data.screenshot_base64}`;
+          screenshot.classList.add('show');
+        }
+
+        showToast('Website tested successfully!');
+        loadRecentReviews();
+        
+      } catch (error) {
+        console.error('Single URL test error:', error);
+        setResult('single-result', `Error testing website: ${error.message}`, false);
+        showToast('Failed to test website', true);
+      } finally {
+        showLoading('single-loading', false);
+      }
+    }
+
+    async function submitBatchUrls() {
+      const batchInput = document.getElementById('batch-urls');
+      const urlsText = batchInput.value.trim();
+      
+      if (!urlsText) {
+        showToast('Please enter at least one URL', true);
+        return;
+      }
+
+      const urls = urlsText.split('\n')
+        .map(url => url.trim())
+        .filter(url => url.length > 0);
+
+      if (urls.length === 0) {
+        showToast('No valid URLs found', true);
+        return;
+      }
+
+      const invalidUrls = urls.filter(url => !isValidUrl(url));
+      if (invalidUrls.length > 0) {
+        showToast(`Invalid URLs found: ${invalidUrls.join(', ')}`, true);
+        return;
+      }
+
+      if (urls.length > 10) {
+        if (!confirm(`You're about to test ${urls.length} websites. This might take a while. Continue?`)) {
+          return;
+        }
+      }
+
+      clearResult('batch-result');
+      showLoading('batch-loading', true);
+
+      try {
+        const response = await fetch('/batch-review', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ urls }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.summary) {
+          setResult('batch-result', data.summary, data.stats?.passed > 0);
+          showToast(`Batch test completed! ${data.stats?.passed || 0}/${data.stats?.total || 0} sites passed`);
+        } else {
+          const text = await response.text();
+          setResult('batch-result', text);
+          showToast('Batch test completed!');
+        }
+
+        loadRecentReviews();
+        
+      } catch (error) {
+        console.error('Batch test error:', error);
+        setResult('batch-result', `Error testing websites: ${error.message}`, false);
+        showToast('Failed to test websites', true);
+      } finally {
+        showLoading('batch-loading', false);
+      }
+    }
+
+    async function loadRecentReviews() {
+      try {
+        const response = await fetch('/api/recent-reviews');
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const reviews = await response.json();
+        allReviews = reviews;
+        displayReviews(reviews);
+        updateStats(reviews);
+        
+      } catch (error) {
+        console.error('Failed to load reviews:', error);
+        const list = document.getElementById('reviews-list');
+        list.innerHTML = '<li class="review-item error">Failed to load recent reviews</li>';
+      }
+    }
+
+    function displayReviews(reviews) {
+      const list = document.getElementById('reviews-list');
+      
+      if (!reviews || reviews.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <p>No recent reviews yet. Test a website to get started.</p>
+          </div>
+        `;
+        return;
+      }
+
+      list.innerHTML = '';
+      reviews.forEach(review => {
+        const li = document.createElement('li');
+        const isApproved = review.review.includes('APPROVED');
+        const isDenied = review.review.includes('DENIED');
+        
+        li.className = `review-item ${isApproved ? 'approved' : isDenied ? 'denied' : ''}`;
+        
+        li.innerHTML = `
+          <div class="review-timestamp">${new Date(review.created_at).toLocaleString()}</div>
+          <div class="review-url">${review.url}</div>
+          <div class="review-status">${review.review}</div>
+        `;
+        
+        list.appendChild(li);
+      });
+    }
+
+    function updateStats(reviews) {
+      if (!reviews || reviews.length === 0) {
+        document.getElementById('stats-container').style.display = 'none';
+        return;
+      }
+
+      const total = reviews.length;
+      const approved = reviews.filter(r => r.review.includes('APPROVED')).length;
+      const denied = reviews.filter(r => r.review.includes('DENIED')).length;
+      const successRate = total > 0 ? Math.round((approved / total) * 100) : 0;
+
+      const statsContainer = document.getElementById('stats-container');
+      statsContainer.innerHTML = `
+        <div class="stat">
+          <span class="stat-number">${total}</span>
+          <div class="stat-label">Total</div>
+        </div>
+        <div class="stat">
+          <span class="stat-number">${approved}</span>
+          <div class="stat-label">Approved</div>
+        </div>
+        <div class="stat">
+          <span class="stat-number">${denied}</span>
+          <div class="stat-label">Denied</div>
+        </div>
+        <div class="stat">
+          <span class="stat-number">${successRate}%</span>
+          <div class="stat-label">Success Rate</div>
+        </div>
+      `;
+      statsContainer.style.display = 'grid';
+    }
+
+    function clearHistory() {
+      if (confirm('Are you sure you want to clear all review history? This action cannot be undone.')) {
+        showToast('Clear history feature not implemented yet', true);
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && e.ctrlKey) {
+        if (document.activeElement.id === 'url') {
+          submitSingleUrl();
+        } else if (document.activeElement.id === 'batch-urls') {
+          submitBatchUrls();
+        }
+      }
+    });
+
+    setInterval(loadRecentReviews, 30000);
     loadRecentReviews();
   </script>
 </body>
