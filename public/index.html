@@ -966,8 +966,6 @@
 
     function filterReviews(filter) {
       currentFilter = filter;
-      
-      // Update active tab
       document.querySelectorAll('.filter-tab').forEach(tab => tab.classList.remove('active'));
       event.target.classList.add('active');
       
@@ -982,7 +980,7 @@
         }
         
         const data = await response.json();
-        // Handle both old format (array) and new format (object with reviews array)
+
         allReviews = data.reviews || data || [];
         displayReviews(allReviews);
         updateStats();
@@ -1054,7 +1052,6 @@
           clickedElements = aiResponse.clickedElements || 0;
           visitedPages = aiResponse.visitedPages || 0;
         } catch (e) {
-          // Ignore parsing errors
         }
         
         let className = 'review-item';
@@ -1093,7 +1090,6 @@
       try {
         const response = await fetch('/api/stats');
         if (!response.ok) {
-          // Fallback to calculating stats from reviews if endpoint doesn't exist
           updateStatsFromReviews();
           return;
         }
@@ -1178,7 +1174,7 @@
 
     function clearHistory() {
       if (confirm('Are you sure you want to clear all review history? This action cannot be undone.')) {
-        showToast('Clear history feature not implemented yet - contact admin', true);
+        showToast('Clear history feature not implemented yet - contact @Rushmore', true);
       }
     }
 
@@ -1201,15 +1197,11 @@
       }
     });
 
-    // Auto-refresh reviews every 30 seconds
     setInterval(loadRecentReviews, 30000);
-    
-    // Load initial data
-    loadRecentReviews();
 
-    // Show tip for enhanced features
+    loadRecentReviews();
     setTimeout(() => {
-      showToast('💡 Tip: Enable multi-page testing for comprehensive site analysis');
+      showToast('Use enhanced testing for multi page sites! - Made by Rushmore');
     }, 3000);
   </script>
 </body>
