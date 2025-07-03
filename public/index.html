@@ -5,34 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Striker - Website Tester</title>
   <style>
+    @font-face {
+      font-family: 'Phantom Sans';
+      src: url('https://assets.hackclub.com/fonts/Phantom_Sans_0.7/Regular.woff') format('woff'),
+           url('https://assets.hackclub.com/fonts/Phantom_Sans_0.7/Regular.woff2') format('woff2');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+    
+    @font-face {
+      font-family: 'Phantom Sans';
+      src: url('https://assets.hackclub.com/fonts/Phantom_Sans_0.7/Bold.woff') format('woff'),
+           url('https://assets.hackclub.com/fonts/Phantom_Sans_0.7/Bold.woff2') format('woff2');
+      font-weight: bold;
+      font-style: normal;
+      font-display: swap;
+    }
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
     
-    :root {
-      --hc-red: #ec3750;
-      --hc-orange: #ff8c37;
-      --hc-yellow: #f1c40f;
-      --hc-green: #33d6a6;
-      --hc-cyan: #5bc0de;
-      --hc-blue: #338eda;
-      --hc-purple: #a633d6;
-      --hc-dark: #1f2d3d;
-      --hc-slate: #3c4858;
-      --hc-muted: #8492a6;
-      --hc-smoke: #e0e6ed;
-      --hc-snow: #f9fafc;
-      --hc-white: #ffffff;
-    }
-    
     body {
-      font-family: 'Phantom Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--hc-snow);
-      color: var(--hc-dark);
+      font-family: 'Phantom Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       line-height: 1.5;
+      color: #1f2d3d;
+      background: #f9fafc;
       font-size: 16px;
+      -webkit-font-smoothing: antialiased;
     }
     
     .container {
@@ -42,66 +45,63 @@
     }
     
     .header {
-      background: var(--hc-white);
+      background: white;
       border-radius: 12px;
       padding: 32px;
-      margin-bottom: 32px;
-      border: 1px solid var(--hc-smoke);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      margin-bottom: 24px;
+      border: 1px solid #e0e6ed;
     }
     
     .logo {
       display: flex;
       align-items: center;
-      gap: 16px;
-      margin-bottom: 16px;
-    }
-    
-    .logo h1 {
-      font-size: 32px;
-      font-weight: 800;
-      color: var(--hc-red);
-      margin: 0;
+      gap: 12px;
+      margin-bottom: 8px;
     }
     
     .logo-icon {
-      width: 40px;
-      height: 40px;
-      background: var(--hc-red);
-      border-radius: 8px;
+      width: 32px;
+      height: 32px;
+      background: #ec3750;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
       color: white;
       font-weight: bold;
-      font-size: 18px;
+      font-size: 16px;
+    }
+    
+    .logo h1 {
+      font-size: 24px;
+      font-weight: bold;
+      color: #ec3750;
     }
     
     .subtitle {
-      color: var(--hc-slate);
-      font-size: 18px;
-      margin-bottom: 24px;
+      color: #8492a6;
+      font-size: 16px;
+      margin-bottom: 20px;
     }
     
     .nav-links {
       display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
+      gap: 8px;
     }
     
     .nav-link {
-      padding: 8px 16px;
-      background: var(--hc-smoke);
-      color: var(--hc-slate);
+      padding: 6px 12px;
+      background: #e0e6ed;
+      color: #3c4858;
       text-decoration: none;
       border-radius: 6px;
-      font-weight: 500;
       font-size: 14px;
-      transition: all 0.2s ease;
+      font-weight: 500;
+      transition: background-color 0.2s;
     }
     
     .nav-link:hover {
-      background: var(--hc-muted);
+      background: #8492a6;
       color: white;
     }
     
@@ -109,7 +109,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 24px;
-      margin-bottom: 32px;
+      margin-bottom: 24px;
     }
     
     @media (max-width: 768px) {
@@ -118,22 +118,21 @@
       }
     }
     
-    .panel {
-      background: var(--hc-white);
+    .card {
+      background: white;
       border-radius: 12px;
       padding: 24px;
-      border: 1px solid var(--hc-smoke);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid #e0e6ed;
     }
     
-    .panel-header {
+    .card-header {
       display: flex;
       align-items: center;
       gap: 12px;
       margin-bottom: 20px;
     }
     
-    .panel-icon {
+    .card-icon {
       width: 24px;
       height: 24px;
       border-radius: 4px;
@@ -142,90 +141,110 @@
       justify-content: center;
       font-size: 14px;
       font-weight: bold;
+      color: white;
     }
     
     .single-icon {
-      background: var(--hc-blue);
-      color: white;
+      background: #338eda;
     }
     
     .batch-icon {
-      background: var(--hc-purple);
-      color: white;
+      background: #a633d6;
     }
     
-    h2 {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--hc-dark);
-      margin: 0;
+    .card h2 {
+      font-size: 18px;
+      font-weight: bold;
+      color: #1f2d3d;
     }
     
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
     
-    label {
+    .form-label {
       display: block;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       font-weight: 600;
-      color: var(--hc-slate);
+      color: #3c4858;
       font-size: 14px;
     }
     
-    input, textarea {
+    .form-input, .form-textarea, .form-select {
       width: 100%;
-      padding: 12px;
-      border: 2px solid var(--hc-smoke);
-      border-radius: 8px;
-      font-size: 16px;
-      font-family: inherit;
-      transition: border-color 0.2s ease;
-      background: var(--hc-white);
-    }
-    
-    input:focus, textarea:focus {
-      outline: none;
-      border-color: var(--hc-blue);
-    }
-    
-    textarea {
-      resize: vertical;
-      min-height: 100px;
-      font-family: 'SF Mono', Consolas, monospace;
+      padding: 8px 12px;
+      border: 1px solid #e0e6ed;
+      border-radius: 6px;
       font-size: 14px;
+      font-family: inherit;
+      background: white;
+      color: #1f2d3d;
+    }
+    
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      outline: none;
+      border-color: #338eda;
+    }
+    
+    .form-textarea {
+      resize: vertical;
+      min-height: 80px;
+      font-family: 'SF Mono', monospace;
+      font-size: 13px;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    
+    .checkbox-group input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+    }
+    
+    .checkbox-group label {
+      margin: 0;
+      font-weight: 400;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    
+    .advanced-options {
+      background: #f9fafc;
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 16px;
+      border: 1px solid #e0e6ed;
+    }
+    
+    .advanced-options h4 {
+      color: #8492a6;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
     }
     
     .btn {
       width: 100%;
-      padding: 12px 20px;
+      padding: 10px 16px;
       border: none;
-      border-radius: 8px;
-      font-size: 16px;
+      border-radius: 6px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s ease;
       font-family: inherit;
-    }
-    
-    .btn-primary {
-      background: var(--hc-red);
-      color: white;
-    }
-    
-    .btn-primary:hover:not(:disabled) {
-      background: #d63447;
-      transform: translateY(-1px);
-    }
-    
-    .btn-secondary {
-      background: var(--hc-purple);
-      color: white;
-    }
-    
-    .btn-secondary:hover:not(:disabled) {
-      background: #9629c4;
-      transform: translateY(-1px);
+      transition: background-color 0.2s;
     }
     
     .btn:disabled {
@@ -233,11 +252,32 @@
       cursor: not-allowed;
     }
     
+    .btn-primary {
+      background: #ec3750;
+      color: white;
+    }
+    
+    .btn-primary:hover:not(:disabled) {
+      background: #d63447;
+    }
+    
+    .btn-secondary {
+      background: #a633d6;
+      color: white;
+    }
+    
+    .btn-secondary:hover:not(:disabled) {
+      background: #9629c4;
+    }
+    
     .loading {
       display: none;
       padding: 16px;
       text-align: center;
-      color: var(--hc-muted);
+      color: #8492a6;
+      background: #f9fafc;
+      border-radius: 6px;
+      margin-top: 12px;
       font-size: 14px;
     }
     
@@ -249,8 +289,8 @@
       display: inline-block;
       width: 16px;
       height: 16px;
-      border: 2px solid var(--hc-smoke);
-      border-top: 2px solid var(--hc-blue);
+      border: 2px solid #e0e6ed;
+      border-top: 2px solid #338eda;
       border-radius: 50%;
       animation: spin 1s linear infinite;
       margin-right: 8px;
@@ -261,53 +301,76 @@
       100% { transform: rotate(360deg); }
     }
     
+    .progress-bar {
+      width: 100%;
+      height: 3px;
+      background: #e0e6ed;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: #338eda;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    
     .result {
       margin-top: 16px;
       padding: 16px;
-      border-radius: 8px;
-      font-family: 'SF Mono', Consolas, monospace;
-      font-size: 13px;
+      border-radius: 6px;
+      font-family: 'SF Mono', monospace;
+      font-size: 12px;
       line-height: 1.4;
       white-space: pre-wrap;
       max-height: 300px;
       overflow-y: auto;
-      border: 1px solid var(--hc-smoke);
-      background: var(--hc-snow);
+      background: #f9fafc;
+      color: #1f2d3d;
+      border: 1px solid #e0e6ed;
     }
     
     .result.success {
-      border-color: var(--hc-green);
       background: #f0fdf4;
+      border-color: #33d6a6;
     }
     
     .result.error {
-      border-color: var(--hc-red);
       background: #fef2f2;
+      border-color: #ec3750;
     }
     
     .screenshot {
       margin-top: 16px;
       max-width: 100%;
-      border-radius: 8px;
-      border: 1px solid var(--hc-smoke);
+      border-radius: 6px;
       display: none;
+      border: 1px solid #e0e6ed;
     }
     
     .screenshot.show {
       display: block;
     }
     
-    .history-panel {
-      background: var(--hc-white);
+    .dashboard {
+      background: white;
       border-radius: 12px;
       padding: 24px;
-      border: 1px solid var(--hc-smoke);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid #e0e6ed;
+    }
+    
+    .dashboard h2 {
+      font-size: 18px;
+      font-weight: bold;
+      color: #1f2d3d;
+      margin-bottom: 20px;
     }
     
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
       gap: 12px;
       margin-bottom: 24px;
     }
@@ -315,24 +378,55 @@
     .stat {
       text-align: center;
       padding: 16px 12px;
-      border-radius: 8px;
-      background: var(--hc-snow);
-      border: 1px solid var(--hc-smoke);
+      border-radius: 6px;
+      background: #f9fafc;
+      border: 1px solid #e0e6ed;
     }
     
     .stat-number {
       font-size: 24px;
-      font-weight: 800;
-      color: var(--hc-dark);
+      font-weight: bold;
+      color: #1f2d3d;
       display: block;
+      line-height: 1;
+      margin-bottom: 4px;
     }
     
     .stat-label {
-      font-size: 12px;
-      color: var(--hc-muted);
+      font-size: 11px;
+      color: #8492a6;
       text-transform: uppercase;
       font-weight: 600;
       letter-spacing: 0.5px;
+    }
+    
+    .filter-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #e0e6ed;
+      padding-bottom: 12px;
+    }
+    
+    .filter-tab {
+      padding: 6px 12px;
+      border: none;
+      background: none;
+      color: #8492a6;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 13px;
+    }
+    
+    .filter-tab.active {
+      background: #338eda;
+      color: white;
+    }
+    
+    .filter-tab:hover:not(.active) {
+      background: #f9fafc;
     }
     
     .reviews-list {
@@ -342,63 +436,79 @@
     }
     
     .review-item {
-      padding: 12px;
+      padding: 12px 16px;
       margin-bottom: 8px;
       border-radius: 6px;
-      border-left: 3px solid var(--hc-smoke);
-      background: var(--hc-snow);
-      font-size: 14px;
+      background: #f9fafc;
+      border-left: 3px solid #e0e6ed;
+      font-size: 13px;
     }
     
     .review-item.approved {
-      border-left-color: var(--hc-green);
+      border-left-color: #33d6a6;
       background: #f0fdf4;
     }
     
     .review-item.denied {
-      border-left-color: var(--hc-red);
+      border-left-color: #ec3750;
       background: #fef2f2;
     }
     
     .review-timestamp {
-      font-size: 12px;
-      color: var(--hc-muted);
+      font-size: 11px;
+      color: #8492a6;
       margin-bottom: 4px;
+      font-weight: 600;
     }
     
     .review-url {
       font-weight: 600;
-      color: var(--hc-blue);
+      color: #338eda;
       word-break: break-all;
       margin-bottom: 4px;
     }
     
     .review-status {
       font-weight: 500;
-      font-size: 13px;
+      font-size: 12px;
+    }
+    
+    .review-metrics {
+      font-size: 11px;
+      color: #8492a6;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    
+    .metric {
+      background: rgba(255, 255, 255, 0.8);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid #e0e6ed;
     }
     
     .approved .review-status {
-      color: var(--hc-green);
+      color: #33d6a6;
     }
     
     .denied .review-status {
-      color: var(--hc-red);
+      color: #ec3750;
     }
     
     .toast {
       position: fixed;
-      top: 24px;
-      right: 24px;
+      top: 20px;
+      right: 20px;
       padding: 12px 16px;
-      border-radius: 8px;
+      border-radius: 6px;
       color: white;
       font-weight: 500;
-      font-size: 14px;
+      font-size: 13px;
       transform: translateX(400px);
       transition: transform 0.3s ease;
       z-index: 1000;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
     
     .toast.show {
@@ -406,23 +516,45 @@
     }
     
     .toast.success {
-      background: var(--hc-green);
+      background: #33d6a6;
     }
     
     .toast.error {
-      background: var(--hc-red);
+      background: #ec3750;
     }
     
     .empty-state {
       text-align: center;
       padding: 40px 20px;
-      color: var(--hc-muted);
+      color: #8492a6;
     }
     
     .empty-state-icon {
-      font-size: 48px;
-      margin-bottom: 16px;
+      font-size: 32px;
+      margin-bottom: 12px;
       opacity: 0.5;
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 16px;
+      }
+      
+      .header {
+        padding: 20px;
+      }
+      
+      .card {
+        padding: 20px;
+      }
+      
+      .dashboard {
+        padding: 20px;
+      }
+      
+      .form-row {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -442,15 +574,37 @@
     </div>
     
     <div class="main-grid">
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-icon single-icon">1</div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon single-icon">1</div>
           <h2>Single Site Test</h2>
         </div>
         
         <div class="form-group">
-          <label for="url">Website URL</label>
-          <input type="text" id="url" placeholder="https://example.com" />
+          <label class="form-label" for="url">Website URL</label>
+          <input type="text" id="url" class="form-input" placeholder="https://example.com" />
+        </div>
+        
+        <div class="advanced-options">
+          <h4>Advanced Options</h4>
+          <div class="checkbox-group">
+            <input type="checkbox" id="single-deep-test" />
+            <label for="single-deep-test">Enable multi-page navigation testing</label>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="single-max-depth">Navigation Depth</label>
+              <select id="single-max-depth" class="form-select">
+                <option value="1">1 Level</option>
+                <option value="2" selected>2 Levels</option>
+                <option value="3">3 Levels</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="single-timeout">Timeout (seconds)</label>
+              <input type="number" id="single-timeout" class="form-input" value="20" min="10" max="60" />
+            </div>
+          </div>
         </div>
         
         <button class="btn btn-primary" onclick="submitSingleUrl()">
@@ -460,21 +614,50 @@
         <div class="loading" id="single-loading">
           <div class="spinner"></div>
           Testing website...
+          <div class="progress-bar">
+            <div class="progress-fill" id="single-progress"></div>
+          </div>
         </div>
         
         <div class="result" id="single-result"></div>
         <img class="screenshot" id="single-screenshot" />
       </div>
       
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-icon batch-icon">*</div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon batch-icon">*</div>
           <h2>Batch Testing</h2>
         </div>
         
         <div class="form-group">
-          <label for="batch-urls">Website URLs (one per line)</label>
-          <textarea id="batch-urls" placeholder="https://example1.com&#10;https://example2.com&#10;https://example3.com"></textarea>
+          <label class="form-label" for="batch-urls">Website URLs (one per line)</label>
+          <textarea id="batch-urls" class="form-textarea" placeholder="https://example1.com&#10;https://example2.com&#10;https://example3.com"></textarea>
+        </div>
+        
+        <div class="advanced-options">
+          <h4>Batch Options</h4>
+          <div class="checkbox-group">
+            <input type="checkbox" id="batch-deep-test" />
+            <label for="batch-deep-test">Enable multi-page testing for all sites</label>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="batch-max-depth">Navigation Depth</label>
+              <select id="batch-max-depth" class="form-select">
+                <option value="1">1 Level</option>
+                <option value="2" selected>2 Levels</option>
+                <option value="3">3 Levels</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="batch-max-sites">Max Sites</label>
+              <select id="batch-max-sites" class="form-select">
+                <option value="5" selected>5 Sites</option>
+                <option value="10">10 Sites</option>
+                <option value="20">20 Sites</option>
+              </select>
+            </div>
+          </div>
         </div>
         
         <button class="btn btn-secondary" onclick="submitBatchUrls()">
@@ -483,17 +666,27 @@
         
         <div class="loading" id="batch-loading">
           <div class="spinner"></div>
-          Testing websites...
+          <span id="batch-status">Processing batch test...</span>
+          <div class="progress-bar">
+            <div class="progress-fill" id="batch-progress"></div>
+          </div>
         </div>
         
         <div class="result" id="batch-result"></div>
       </div>
     </div>
     
-    <div class="history-panel">
+    <div class="dashboard">
       <h2>Recent Reviews</h2>
       
       <div class="stats-grid" id="stats-container" style="display: none;"></div>
+      
+      <div class="filter-tabs">
+        <button class="filter-tab active" onclick="filterReviews('all')">All Tests</button>
+        <button class="filter-tab" onclick="filterReviews('approved')">✅ Approved</button>
+        <button class="filter-tab" onclick="filterReviews('denied')">❌ Denied</button>
+        <button class="filter-tab" onclick="filterReviews('enhanced')">⚡ Enhanced</button>
+      </div>
       
       <ul class="reviews-list" id="reviews-list">
         <li class="review-item">Loading recent reviews...</li>
@@ -505,6 +698,7 @@
 
   <script>
     let allReviews = [];
+    let currentFilter = 'all';
 
     function showToast(message, isError = false) {
       const toast = document.getElementById('toast');
@@ -518,6 +712,13 @@
     function showLoading(elementId, show = true) {
       const element = document.getElementById(elementId);
       element.classList.toggle('show', show);
+    }
+
+    function updateProgress(elementId, percentage) {
+      const progressBar = document.getElementById(elementId);
+      if (progressBar) {
+        progressBar.style.width = `${percentage}%`;
+      }
     }
 
     function clearResult(resultId) {
@@ -545,6 +746,8 @@
     async function submitSingleUrl() {
       const urlInput = document.getElementById('url');
       const url = urlInput.value.trim();
+      const deepTest = document.getElementById('single-deep-test').checked;
+      const maxDepth = parseInt(document.getElementById('single-max-depth').value);
       
       if (!url) {
         showToast('Please enter a URL', true);
@@ -558,37 +761,98 @@
 
       clearResult('single-result');
       showLoading('single-loading', true);
+      updateProgress('single-progress', 10);
       
       const screenshot = document.getElementById('single-screenshot');
       screenshot.classList.remove('show');
 
       try {
-        const response = await fetch('/review', {
+        updateProgress('single-progress', 30);
+        
+        const endpoint = deepTest ? '/batch-review' : '/review';
+        const body = deepTest ? 
+          JSON.stringify({ urls: [url], deepTest: true, maxDepth }) :
+          JSON.stringify({ url });
+
+        const response = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url }),
+          body: body,
         });
 
+        updateProgress('single-progress', 70);
+
         if (!response.ok) {
+          if (response.status === 429) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Rate limit exceeded');
+          }
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
 
         const data = await response.json();
+        updateProgress('single-progress', 90);
         
-        setResult('single-result', `Review completed for: ${url}\n\nHTML Preview:\n${data.html}`, true);
-        
-        if (data.screenshot_base64) {
-          screenshot.src = `data:image/png;base64,${data.screenshot_base64}`;
-          screenshot.classList.add('show');
+        let resultText = '';
+        if (deepTest && data.results && data.results.length > 0) {
+          const result = data.results[0];
+          resultText = `Enhanced Analysis Results for: ${url}\n\n`;
+          resultText += `Status: ${result.finalDecision}\n`;
+          if (result.combinedReasons) {
+            resultText += `Reason: ${result.combinedReasons}\n`;
+          }
+          if (result.metrics) {
+            resultText += `\nMetrics:\n`;
+            resultText += `• Content: ${result.metrics.paragraphs} paragraphs, ${result.metrics.headings} headings\n`;
+            resultText += `• Interactive: ${result.metrics.forms} forms, ${result.metrics.buttons} buttons\n`;
+            resultText += `• Navigation: ${result.metrics.links} links found\n`;
+            resultText += `• Content Length: ${result.metrics.contentLength} characters\n`;
+          }
+          if (result.clickedElements) {
+            resultText += `• User Interactions: ${result.clickedElements} successful clicks\n`;
+          }
+          if (result.visitedPages) {
+            resultText += `• Pages Explored: ${result.visitedPages} additional pages\n`;
+          }
+          if (result.issues) {
+            resultText += `• Issues: ${result.issues.console || 0} console, ${result.issues.requests || 0} failed requests\n`;
+          }
+          resultText += `\nSummary:\n${data.summary}`;
+          
+          if (result.screenshot_base64) {
+            screenshot.src = `data:image/png;base64,${result.screenshot_base64}`;
+            screenshot.classList.add('show');
+          }
+        } else {
+          resultText = `Review completed for: ${url}\n\n`;
+          if (data.status) {
+            resultText += `Status: ${data.status}\n`;
+          }
+          if (data.metrics) {
+            resultText += `Title: ${data.metrics.title}\n`;
+            resultText += `Content Length: ${data.metrics.contentLength} characters\n`;
+            resultText += `Has Form: ${data.metrics.hasForm ? 'Yes' : 'No'}\n`;
+            resultText += `Has Buttons: ${data.metrics.hasButtons ? 'Yes' : 'No'}\n`;
+          }
+          resultText += `\nHTML Preview:\n${data.html}`;
+          
+          if (data.screenshot_base64) {
+            screenshot.src = `data:image/png;base64,${data.screenshot_base64}`;
+            screenshot.classList.add('show');
+          }
         }
-
-        showToast('Website tested successfully!');
+        
+        setResult('single-result', resultText, true);
+        updateProgress('single-progress', 100);
+        
+        showToast('Website test completed successfully!');
         loadRecentReviews();
         
       } catch (error) {
         console.error('Single URL test error:', error);
         setResult('single-result', `Error testing website: ${error.message}`, false);
         showToast('Failed to test website', true);
+        updateProgress('single-progress', 0);
       } finally {
         showLoading('single-loading', false);
       }
@@ -597,6 +861,9 @@
     async function submitBatchUrls() {
       const batchInput = document.getElementById('batch-urls');
       const urlsText = batchInput.value.trim();
+      const deepTest = document.getElementById('batch-deep-test').checked;
+      const maxDepth = parseInt(document.getElementById('batch-max-depth').value);
+      const maxSites = parseInt(document.getElementById('batch-max-sites').value);
       
       if (!urlsText) {
         showToast('Please enter at least one URL', true);
@@ -618,30 +885,61 @@
         return;
       }
 
-      if (urls.length > 10) {
-        if (!confirm(`You're about to test ${urls.length} websites. This might take a while. Continue?`)) {
+      if (urls.length > 20) {
+        showToast('Maximum 20 URLs allowed per batch', true);
+        return;
+      }
+
+      if (urls.length > maxSites) {
+        if (!confirm(`You're about to test ${urls.length} websites (max recommended: ${maxSites}). This might take a while. Continue?`)) {
           return;
         }
       }
 
       clearResult('batch-result');
       showLoading('batch-loading', true);
+      updateProgress('batch-progress', 5);
+      document.getElementById('batch-status').textContent = `Initializing batch test for ${urls.length} websites...`;
 
       try {
+        updateProgress('batch-progress', 15);
+        
         const response = await fetch('/batch-review', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ urls }),
+          body: JSON.stringify({ urls, deepTest, maxDepth }),
         });
 
+        updateProgress('batch-progress', 30);
+        document.getElementById('batch-status').textContent = 'Processing websites...';
+
         if (!response.ok) {
+          if (response.status === 429) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Rate limit exceeded');
+          }
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
 
+        updateProgress('batch-progress', 80);
+        document.getElementById('batch-status').textContent = 'Analyzing results...';
+
         const data = await response.json();
+        updateProgress('batch-progress', 95);
         
         if (data.summary) {
-          setResult('batch-result', data.summary, data.stats?.passed > 0);
+          let enhancedSummary = data.summary;
+          if (data.enhancedTesting) {
+            enhancedSummary += `\n\nEnhanced Testing Metrics:`;
+            enhancedSummary += `\n• Total Interactions: ${data.stats?.totalInteractions || 0}`;
+            enhancedSummary += `\n• Pages Explored: ${data.stats?.totalPagesVisited || 0}`;
+            enhancedSummary += `\n• Average Content Length: ${data.stats?.avgContentLength || 0} chars`;
+            enhancedSummary += `\n• Success Rate: ${data.stats?.successRate || 0}%`;
+            enhancedSummary += `\n• Deep Navigation: ${deepTest ? 'Enabled' : 'Disabled'}`;
+            enhancedSummary += `\n• Max Depth: ${maxDepth} levels`;
+          }
+          
+          setResult('batch-result', enhancedSummary, data.stats?.passed > 0);
           showToast(`Batch test completed! ${data.stats?.passed || 0}/${data.stats?.total || 0} sites passed`);
         } else {
           const text = await response.text();
@@ -649,15 +947,31 @@
           showToast('Batch test completed!');
         }
 
+        updateProgress('batch-progress', 100);
+        document.getElementById('batch-status').textContent = 'Analysis complete!';
         loadRecentReviews();
         
       } catch (error) {
         console.error('Batch test error:', error);
         setResult('batch-result', `Error testing websites: ${error.message}`, false);
         showToast('Failed to test websites', true);
+        updateProgress('batch-progress', 0);
+        document.getElementById('batch-status').textContent = 'Analysis failed';
       } finally {
-        showLoading('batch-loading', false);
+        setTimeout(() => {
+          showLoading('batch-loading', false);
+        }, 1000);
       }
+    }
+
+    function filterReviews(filter) {
+      currentFilter = filter;
+      
+      // Update active tab
+      document.querySelectorAll('.filter-tab').forEach(tab => tab.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      displayReviews(allReviews);
     }
 
     async function loadRecentReviews() {
@@ -667,15 +981,16 @@
           throw new Error(`HTTP ${response.status}`);
         }
         
-        const reviews = await response.json();
-        allReviews = reviews;
-        displayReviews(reviews);
-        updateStats(reviews);
+        const data = await response.json();
+        // Handle both old format (array) and new format (object with reviews array)
+        allReviews = data.reviews || data || [];
+        displayReviews(allReviews);
+        updateStats();
         
       } catch (error) {
         console.error('Failed to load reviews:', error);
         const list = document.getElementById('reviews-list');
-        list.innerHTML = '<li class="review-item error">Failed to load recent reviews</li>';
+        list.innerHTML = '<li class="review-item">Failed to load recent reviews</li>';
       }
     }
 
@@ -692,33 +1007,147 @@
         return;
       }
 
+      // Filter reviews
+      let filteredReviews = reviews;
+      if (currentFilter !== 'all') {
+        if (currentFilter === 'approved') {
+          filteredReviews = reviews.filter(r => r.review.includes('APPROVED'));
+        } else if (currentFilter === 'denied') {
+          filteredReviews = reviews.filter(r => r.review.includes('DENIED'));
+        } else if (currentFilter === 'enhanced') {
+          filteredReviews = reviews.filter(r => {
+            try {
+              const aiResponse = JSON.parse(r.ai_raw_response || '{}');
+              return aiResponse.enhancedTesting === true;
+            } catch {
+              return false;
+            }
+          });
+        }
+      }
+
+      if (filteredReviews.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">🔍</div>
+            <p>No reviews found for the selected filter.</p>
+          </div>
+        `;
+        return;
+      }
+
       list.innerHTML = '';
-      reviews.forEach(review => {
+      filteredReviews.forEach(review => {
         const li = document.createElement('li');
         const isApproved = review.review.includes('APPROVED');
         const isDenied = review.review.includes('DENIED');
         
-        li.className = `review-item ${isApproved ? 'approved' : isDenied ? 'denied' : ''}`;
+        let isEnhanced = false;
+        let metrics = null;
+        let clickedElements = 0;
+        let visitedPages = 0;
+        
+        try {
+          const aiResponse = JSON.parse(review.ai_raw_response || '{}');
+          isEnhanced = aiResponse.enhancedTesting === true;
+          metrics = aiResponse.metrics;
+          clickedElements = aiResponse.clickedElements || 0;
+          visitedPages = aiResponse.visitedPages || 0;
+        } catch (e) {
+          // Ignore parsing errors
+        }
+        
+        let className = 'review-item';
+        if (isApproved) className += ' approved';
+        if (isDenied) className += ' denied';
+        
+        li.className = className;
+        
+        let metricsHtml = '';
+        if (isEnhanced && metrics) {
+          metricsHtml = `
+            <div class="review-metrics">
+              <span class="metric">📄 ${metrics.paragraphs || 0} paragraphs</span>
+              <span class="metric">🔗 ${metrics.links || 0} links</span>
+              <span class="metric">📝 ${metrics.forms || 0} forms</span>
+              <span class="metric">🖱️ ${clickedElements} clicks</span>
+              ${visitedPages > 0 ? `<span class="metric">🗺️ ${visitedPages} pages</span>` : ''}
+            </div>
+          `;
+        }
+        
+        const enhancedBadge = isEnhanced ? ' ⚡' : '';
         
         li.innerHTML = `
-          <div class="review-timestamp">${new Date(review.created_at).toLocaleString()}</div>
+          <div class="review-timestamp">${new Date(review.created_at).toLocaleString()}${enhancedBadge}</div>
           <div class="review-url">${review.url}</div>
           <div class="review-status">${review.review}</div>
+          ${metricsHtml}
         `;
         
         list.appendChild(li);
       });
     }
 
-    function updateStats(reviews) {
-      if (!reviews || reviews.length === 0) {
+    async function updateStats() {
+      try {
+        const response = await fetch('/api/stats');
+        if (!response.ok) {
+          // Fallback to calculating stats from reviews if endpoint doesn't exist
+          updateStatsFromReviews();
+          return;
+        }
+        
+        const stats = await response.json();
+        
+        const statsContainer = document.getElementById('stats-container');
+        statsContainer.innerHTML = `
+          <div class="stat">
+            <span class="stat-number">${stats.total}</span>
+            <div class="stat-label">Total</div>
+          </div>
+          <div class="stat">
+            <span class="stat-number">${stats.approved}</span>
+            <div class="stat-label">Approved</div>
+          </div>
+          <div class="stat">
+            <span class="stat-number">${stats.denied}</span>
+            <div class="stat-label">Denied</div>
+          </div>
+          <div class="stat">
+            <span class="stat-number">${stats.enhanced}</span>
+            <div class="stat-label">Enhanced</div>
+          </div>
+          <div class="stat">
+            <span class="stat-number">${stats.successRate}%</span>
+            <div class="stat-label">Success Rate</div>
+          </div>
+        `;
+        statsContainer.style.display = 'grid';
+        
+      } catch (error) {
+        console.error('Failed to load stats:', error);
+        updateStatsFromReviews();
+      }
+    }
+
+    function updateStatsFromReviews() {
+      if (!allReviews || allReviews.length === 0) {
         document.getElementById('stats-container').style.display = 'none';
         return;
       }
 
-      const total = reviews.length;
-      const approved = reviews.filter(r => r.review.includes('APPROVED')).length;
-      const denied = reviews.filter(r => r.review.includes('DENIED')).length;
+      const total = allReviews.length;
+      const approved = allReviews.filter(r => r.review.includes('APPROVED')).length;
+      const denied = allReviews.filter(r => r.review.includes('DENIED')).length;
+      const enhanced = allReviews.filter(r => {
+        try {
+          const aiResponse = JSON.parse(r.ai_raw_response || '{}');
+          return aiResponse.enhancedTesting === true;
+        } catch {
+          return false;
+        }
+      }).length;
       const successRate = total > 0 ? Math.round((approved / total) * 100) : 0;
 
       const statsContainer = document.getElementById('stats-container');
@@ -736,6 +1165,10 @@
           <div class="stat-label">Denied</div>
         </div>
         <div class="stat">
+          <span class="stat-number">${enhanced}</span>
+          <div class="stat-label">Enhanced</div>
+        </div>
+        <div class="stat">
           <span class="stat-number">${successRate}%</span>
           <div class="stat-label">Success Rate</div>
         </div>
@@ -745,7 +1178,7 @@
 
     function clearHistory() {
       if (confirm('Are you sure you want to clear all review history? This action cannot be undone.')) {
-        showToast('Clear history feature not implemented yet', true);
+        showToast('Clear history feature not implemented yet - contact admin', true);
       }
     }
 
@@ -757,10 +1190,27 @@
           submitBatchUrls();
         }
       }
+      
+      if (e.altKey) {
+        switch(e.key) {
+          case '1': filterReviews('all'); break;
+          case '2': filterReviews('approved'); break;
+          case '3': filterReviews('denied'); break;
+          case '4': filterReviews('enhanced'); break;
+        }
+      }
     });
 
+    // Auto-refresh reviews every 30 seconds
     setInterval(loadRecentReviews, 30000);
+    
+    // Load initial data
     loadRecentReviews();
+
+    // Show tip for enhanced features
+    setTimeout(() => {
+      showToast('💡 Tip: Enable multi-page testing for comprehensive site analysis');
+    }, 3000);
   </script>
 </body>
 </html>
