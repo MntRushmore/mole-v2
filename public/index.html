@@ -692,6 +692,22 @@
         <li class="review-item">Loading recent reviews...</li>
       </ul>
     </div>
+
+    <div class="dashboard">
+      <h2>Live Logs</h2>
+      <div class="result" id="live-logs" style="max-height:200px; overflow-y:auto;"></div>
+    </div>
+    <script>
+      const liveLogsDiv = document.getElementById('live-logs');
+      const evtSourceLogs = new EventSource('/api/live-logs');
+      evtSourceLogs.onmessage = (e) => {
+        const data = JSON.parse(e.data);
+        const line = document.createElement('div');
+        line.textContent = `[${data.timestamp}] ${data.message}`;
+        liveLogsDiv.appendChild(line);
+        liveLogsDiv.scrollTop = liveLogsDiv.scrollHeight;
+      };
+    </script>
   </div>
 
   <div class="toast" id="toast"></div>

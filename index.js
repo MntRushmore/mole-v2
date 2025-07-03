@@ -453,20 +453,40 @@ async function simulateUserBehavior(page) {
 }
 
 function generateAIPrompt(pageMetrics, status, clickedElements, visitedPages, deepTest, failedRequests, consoleIssues, htmlSample) {
-  return `You are testing website functionality for Hack Club projects. Analyze if all features work properly.
+  return `You are testing website functionality for Hack Club projects.
+
+ALWAYS respond in EXACTLY one of these formats:
+RESULT: APPROVED
+OR
+RESULT: DENIED
+REASON: [short, specific reason]
 
 EVALUATION CRITERIA:
 ✅ APPROVE if:
 - Page loads successfully (HTTP 200-299)
-- All buttons, forms, and links are functional
-- Navigation works properly
-- No critical errors preventing functionality
+- If interactive features (forms, buttons, links) are present, they work correctly (can be clicked, submitted, etc.)
+- If there are no interactive elements at all, that is acceptable
 
 ❌ DENY if:
-- HTTP error status (400+)
-- Page fails to load
-- Critical functionality is broken (buttons don't work, forms can't submit, links are dead)
-- JavaScript errors prevent interaction
+- HTTP status is 400 or above
+- Page fails to load completely
+- Forms exist but cannot be submitted or interacted with
+- Buttons exist but none are clickable
+- Critical JavaScript errors prevent functionality (e.g. 5+ console errors)
+
+WHEN WRITING THE REASON:
+Be precise. Mention HTTP codes, count of non-working elements, or number of JavaScript errors.
+
+EXAMPLES:
+- RESULT: APPROVED
+- RESULT: DENIED
+  REASON: HTTP 404 - page not found
+
+- RESULT: DENIED
+  REASON: 3 buttons found but none clickable
+
+- RESULT: DENIED
+  REASON: 8 console errors blocking scripts
 
 WEBSITE ANALYSIS:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -492,13 +512,7 @@ ${deepTest ? `• Deep Navigation: Tested ${visitedPages.length} additional page
 ${htmlSample.substring(0, 4000)}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Focus ONLY on functionality - does everything work? Ignore content quality.
-
-Respond with EXACTLY this format:
-RESULT: APPROVED
-OR
-RESULT: DENIED
-REASON: [specific functionality issue]`;
+Focus ONLY on functionality - does everything work? Ignore content quality.`;
 }
 
 app.post('/batch-review', rateLimit, async (req, res) => {
@@ -1059,6 +1073,7 @@ app.get('/health', (req, res) => {
   });
 });
 
+
 app.get('/api/stats', async (req, res) => {
   try {
     const { data, error } = await supabase
@@ -1086,6 +1101,36 @@ app.get('/api/stats', async (req, res) => {
   }
 });
 
+// live logs page
+const logStreamClients = [];
+
+app.get('/api/live-logs', (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.flushHeaders();
+
+  const client = { res };
+  logStreamClients.push(client);
+
+  req.on('close', () => {
+    const index = logStreamClients.indexOf(client);
+    if (index !== -1) logStreamClients.splice(index, 1);
+  });
+});
+
+function broadcastLog(message) {
+  logStreamClients.forEach(client => {
+    client.res.write(`data: ${JSON.stringify({ message, timestamp: new Date().toISOString() })}\n\n`);
+  });
+}
+
+const originalLog = console.log;
+console.log = (...args) => {
+  originalLog(...args);
+  broadcastLog(args.join(' '));
+};
+
 app.use(express.static('public'));
 
 app.get('/', (req, res) => {
@@ -1102,7 +1147,8 @@ app.use((req, res) => {
       'POST /batch-review', 
       'GET /api/recent-reviews',
       'GET /api/stats',
-      'GET /health'
+      'GET /health',
+      'GET /api/live-logs'
     ]
   });
 });
