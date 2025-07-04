@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Striker - Website Tester</title>
+  <title>Striker- A BETTER VERSION OF MOLE</title>
   <style>
     @font-face {
       font-family: 'Phantom Sans';
@@ -76,6 +76,16 @@
       font-size: 24px;
       font-weight: bold;
       color: #ec3750;
+    }
+
+    .version-badge {
+      background: #338eda;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-left: 8px;
     }
     
     .subtitle {
@@ -234,6 +244,20 @@
       margin-bottom: 12px;
       letter-spacing: 0.5px;
     }
+
+    .feature-highlight {
+      background: #f0fdf4;
+      border: 1px solid #33d6a6;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      color: #047857;
+    }
+
+    .feature-highlight strong {
+      color: #065f46;
+    }
     
     .btn {
       width: 100%;
@@ -370,7 +394,7 @@
     
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
       gap: 12px;
       margin-bottom: 24px;
     }
@@ -488,6 +512,18 @@
       border-radius: 4px;
       border: 1px solid #e0e6ed;
     }
+
+    .advanced-metric {
+      background: #e0f2fe;
+      border-color: #0284c7;
+      color: #0369a1;
+    }
+
+    .critical-metric {
+      background: #fef2f2;
+      border-color: #dc2626;
+      color: #991b1b;
+    }
     
     .approved .review-status {
       color: #33d6a6;
@@ -563,11 +599,12 @@
     <div class="header">
       <div class="logo">
         <div class="logo-icon">S</div>
-        <h1>Striker</h1>
+        <h1>Striker<span class="version-badge">v2.0 Advanced</span></h1>
       </div>
-      <p class="subtitle">Website Review + Tester</p>
+      <p class="subtitle">Striker- A better version of MOLE!</p>
       <div class="nav-links">
         <a href="/" class="nav-link">Home</a>
+        <a href="/config" class="nav-link">Config</a>
         <a href="/api/recent-reviews" class="nav-link">Export Data</a>
         <a href="#" class="nav-link" onclick="clearHistory()">Clear History</a>
       </div>
@@ -576,8 +613,12 @@
     <div class="main-grid">
       <div class="card">
         <div class="card-header">
-          <div class="card-icon single-icon">1</div>
-          <h2>Single Site Test</h2>
+          <div class="card-icon single-icon">🔍</div>
+          <h2>Advanced Site Testing</h2>
+        </div>
+
+        <div class="feature-highlight">
+          <strong>Updates I did:</strong> I added human like testing, zero tolerance for failures, and advanced metrics.
         </div>
         
         <div class="form-group">
@@ -586,34 +627,47 @@
         </div>
         
         <div class="advanced-options">
-          <h4>Advanced Options</h4>
+          <h4>Advanced Testing Options</h4>
           <div class="checkbox-group">
-            <input type="checkbox" id="single-deep-test" />
-            <label for="single-deep-test">Enable multi-page navigation testing</label>
+            <input type="checkbox" id="single-deep-test" checked />
+            <label for="single-deep-test">Enable comprehensive multi-page testing</label>
+          </div>
+          <div class="checkbox-group">
+            <input type="checkbox" id="single-form-test" checked />
+            <label for="single-form-test">Test all forms and inputs</label>
+          </div>
+          <div class="checkbox-group">
+            <input type="checkbox" id="single-mobile-test" checked />
+            <label for="single-mobile-test">Mobile responsiveness testing</label>
           </div>
           <div class="form-row">
             <div class="form-group">
               <label class="form-label" for="single-max-depth">Navigation Depth</label>
               <select id="single-max-depth" class="form-select">
                 <option value="1">1 Level</option>
-                <option value="2" selected>2 Levels</option>
-                <option value="3">3 Levels</option>
+                <option value="2">2 Levels</option>
+                <option value="3" selected>3 Levels</option>
+                <option value="4">4 Levels (Max)</option>
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label" for="single-timeout">Timeout (seconds)</label>
-              <input type="number" id="single-timeout" class="form-input" value="20" min="10" max="60" />
+              <label class="form-label" for="single-max-pages">Max Pages</label>
+              <select id="single-max-pages" class="form-select">
+                <option value="5">5 Pages</option>
+                <option value="10" selected>10 Pages</option>
+                <option value="15">15 Pages</option>
+              </select>
             </div>
           </div>
         </div>
         
         <button class="btn btn-primary" onclick="submitSingleUrl()">
-          Test Website
+          🚀 Start Advanced Test
         </button>
         
         <div class="loading" id="single-loading">
           <div class="spinner"></div>
-          Testing website...
+          <span id="single-status">Running comprehensive website analysis...</span>
           <div class="progress-bar">
             <div class="progress-fill" id="single-progress"></div>
           </div>
@@ -625,7 +679,7 @@
       
       <div class="card">
         <div class="card-header">
-          <div class="card-icon batch-icon">*</div>
+          <div class="card-icon batch-icon">⚡</div>
           <h2>Batch Testing</h2>
         </div>
         
@@ -635,10 +689,14 @@
         </div>
         
         <div class="advanced-options">
-          <h4>Batch Options</h4>
+          <h4>Batch Testing Options</h4>
           <div class="checkbox-group">
-            <input type="checkbox" id="batch-deep-test" />
-            <label for="batch-deep-test">Enable multi-page testing for all sites</label>
+            <input type="checkbox" id="batch-deep-test" checked />
+            <label for="batch-deep-test">Enable advanced testing for all sites</label>
+          </div>
+          <div class="checkbox-group">
+            <input type="checkbox" id="batch-strict-mode" checked />
+            <label for="batch-strict-mode">Strict mode (zero tolerance for failures)</label>
           </div>
           <div class="form-row">
             <div class="form-group">
@@ -647,6 +705,7 @@
                 <option value="1">1 Level</option>
                 <option value="2" selected>2 Levels</option>
                 <option value="3">3 Levels</option>
+                <option value="4">4 Levels</option>
               </select>
             </div>
             <div class="form-group">
@@ -661,12 +720,12 @@
         </div>
         
         <button class="btn btn-secondary" onclick="submitBatchUrls()">
-          Test Multiple Sites
+          ⚡ Start Batch Analysis
         </button>
         
         <div class="loading" id="batch-loading">
           <div class="spinner"></div>
-          <span id="batch-status">Processing batch test...</span>
+          <span id="batch-status">Initializing advanced batch testing...</span>
           <div class="progress-bar">
             <div class="progress-fill" id="batch-progress"></div>
           </div>
@@ -677,15 +736,16 @@
     </div>
     
     <div class="dashboard">
-      <h2>Recent Reviews</h2>
+      <h2>Dashboard & Analytics</h2>
       
       <div class="stats-grid" id="stats-container" style="display: none;"></div>
       
       <div class="filter-tabs">
         <button class="filter-tab active" onclick="filterReviews('all')">All Tests</button>
-        <button class="filter-tab" onclick="filterReviews('approved')">✅ Approved</button>
-        <button class="filter-tab" onclick="filterReviews('denied')">❌ Denied</button>
-        <button class="filter-tab" onclick="filterReviews('enhanced')">⚡ Enhanced</button>
+        <button class="filter-tab" onclick="filterReviews('approved')">✅ Passed</button>
+        <button class="filter-tab" onclick="filterReviews('denied')">❌ Failed</button>
+        <button class="filter-tab" onclick="filterReviews('advanced')">⚡ Advanced</button>
+        <button class="filter-tab" onclick="filterReviews('critical')">🚨 Critical</button>
       </div>
       
       <ul class="reviews-list" id="reviews-list">
@@ -694,18 +754,22 @@
     </div>
 
     <div class="dashboard">
-      <h2>Live Logs</h2>
+      <h2>Live Testing Logs</h2>
       <div class="result" id="live-logs" style="max-height:200px; overflow-y:auto;"></div>
     </div>
+    
     <script>
       const liveLogsDiv = document.getElementById('live-logs');
       const evtSourceLogs = new EventSource('/api/live-logs');
       evtSourceLogs.onmessage = (e) => {
         const data = JSON.parse(e.data);
         const line = document.createElement('div');
-        line.textContent = `[${data.timestamp}] ${data.message}`;
+        line.textContent = `[${new Date(data.timestamp).toLocaleTimeString()}] ${data.message}`;
         liveLogsDiv.appendChild(line);
         liveLogsDiv.scrollTop = liveLogsDiv.scrollHeight;
+        while (liveLogsDiv.children.length > 100) { // 100 lines max
+          liveLogsDiv.removeChild(liveLogsDiv.firstChild);
+        }
       };
     </script>
   </div>
@@ -722,7 +786,7 @@
       toast.className = `toast ${isError ? 'error' : 'success'} show`;
       setTimeout(() => {
         toast.classList.remove('show');
-      }, 3000);
+      }, 4000);
     }
 
     function showLoading(elementId, show = true) {
@@ -734,6 +798,13 @@
       const progressBar = document.getElementById(elementId);
       if (progressBar) {
         progressBar.style.width = `${percentage}%`;
+      }
+    }
+
+    function updateStatus(statusId, message) {
+      const element = document.getElementById(statusId);
+      if (element) {
+        element.textContent = message;
       }
     }
 
@@ -778,25 +849,27 @@
       clearResult('single-result');
       showLoading('single-loading', true);
       updateProgress('single-progress', 10);
+      updateStatus('single-status', 'Initializing advanced testing engine...');
       
       const screenshot = document.getElementById('single-screenshot');
       screenshot.classList.remove('show');
 
       try {
-        updateProgress('single-progress', 30);
+        updateProgress('single-progress', 25);
+        updateStatus('single-status', 'Loading page and analyzing structure...');
         
-        const endpoint = deepTest ? '/batch-review' : '/review';
-        const body = deepTest ? 
-          JSON.stringify({ urls: [url], deepTest: true, maxDepth }) :
-          JSON.stringify({ url });
-
-        const response = await fetch(endpoint, {
+        const response = await fetch('/batch-review', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: body,
+          body: JSON.stringify({ 
+            urls: [url], 
+            deepTest: deepTest, 
+            maxDepth: maxDepth 
+          }),
         });
 
-        updateProgress('single-progress', 70);
+        updateProgress('single-progress', 60);
+        updateStatus('single-status', 'Running comprehensive functionality tests...');
 
         if (!response.ok) {
           if (response.status === 429) {
@@ -808,69 +881,96 @@
 
         const data = await response.json();
         updateProgress('single-progress', 90);
+        updateStatus('single-status', 'Generating analysis report...');
         
-        let resultText = '';
-        if (deepTest && data.results && data.results.length > 0) {
+        if (data.results && data.results.length > 0) {
           const result = data.results[0];
-          resultText = `Enhanced Analysis Results for: ${url}\n\n`;
-          resultText += `Status: ${result.finalDecision}\n`;
+          let resultText = `🧪 ADVANCED ANALYSIS REPORT\n`;
+          resultText += `═══════════════════════════════════════\n\n`;
+          resultText += `🔗 URL: ${url}\n`;
+          resultText += `📊 Status: ${result.finalDecision === 'PASS' ? '✅ PASSED' : '❌ FAILED'}\n`;
+          
           if (result.combinedReasons) {
-            resultText += `Reason: ${result.combinedReasons}\n`;
+            resultText += `🚨 Issues: ${result.combinedReasons}\n`;
           }
+          
+          resultText += `\n📋 TESTING METRICS:\n`;
+          resultText += `─────────────────────\n`;
+          
+          if (result.testSummary) {
+            const ts = result.testSummary;
+            resultText += `• Elements Tested: ${ts.testedElements || 0}\n`;
+            resultText += `• Broken Elements: ${ts.brokenElements || 0}\n`;
+            resultText += `• Pages Explored: ${ts.pagesVisited || 0}\n`;
+            resultText += `• Critical Failures: ${ts.criticalFailures || 0}\n`;
+            resultText += `• Total Failures: ${ts.totalFailures || 0}\n`;
+            resultText += `• Warnings: ${ts.warnings || 0}\n`;
+            
+            if (ts.testedElements > 0) {
+              const successRate = Math.round(((ts.testedElements - ts.brokenElements) / ts.testedElements) * 100);
+              resultText += `• Element Success Rate: ${successRate}%\n`;
+            }
+          }
+          
           if (result.metrics) {
-            resultText += `\nMetrics:\n`;
-            resultText += `• Content: ${result.metrics.paragraphs} paragraphs, ${result.metrics.headings} headings\n`;
-            resultText += `• Interactive: ${result.metrics.forms} forms, ${result.metrics.buttons} buttons\n`;
-            resultText += `• Navigation: ${result.metrics.links} links found\n`;
-            resultText += `• Content Length: ${result.metrics.contentLength} characters\n`;
+            resultText += `\n🏗️ PAGE STRUCTURE:\n`;
+            resultText += `─────────────────────\n`;
+            resultText += `• Content: ${result.metrics.paragraphs || 0} paragraphs, ${result.metrics.headings || 0} headings\n`;
+            resultText += `• Interactive: ${result.metrics.forms || 0} forms, ${result.metrics.buttons || 0} buttons\n`;
+            resultText += `• Navigation: ${result.metrics.links || 0} links, ${result.metrics.hasNavigation ? 'Nav present' : 'No nav'}\n`;
+            resultText += `• Content Length: ${result.metrics.contentLength || 0} characters\n`;
+            resultText += `• Features: ${result.metrics.hasInteractiveFeatures ? 'Interactive elements' : 'Static content'}\n`;
           }
-          if (result.clickedElements) {
-            resultText += `• User Interactions: ${result.clickedElements} successful clicks\n`;
-          }
-          if (result.visitedPages) {
-            resultText += `• Pages Explored: ${result.visitedPages} additional pages\n`;
-          }
+          
           if (result.issues) {
-            resultText += `• Issues: ${result.issues.console || 0} console, ${result.issues.requests || 0} failed requests\n`;
+            resultText += `\n⚠️ TECHNICAL ISSUES:\n`;
+            resultText += `─────────────────────\n`;
+            resultText += `• Console Errors: ${result.issues.console || 0}\n`;
+            resultText += `• Failed Requests: ${result.issues.requests || 0}\n`;
+            resultText += `• Response Errors: ${result.issues.responses || 0}\n`;
           }
-          resultText += `\nSummary:\n${data.summary}`;
+
+          if (result.failures && result.failures.length > 0) {
+            resultText += `\n🚨 DETAILED FAILURES:\n`;
+            resultText += `─────────────────────\n`;
+            result.failures.slice(0, 5).forEach(failure => {
+              resultText += `• [${failure.severity?.toUpperCase() || 'MEDIUM'}] ${failure.type}: ${failure.message}\n`;
+            });
+            if (result.failures.length > 5) {
+              resultText += `• ... and ${result.failures.length - 5} more issues\n`;
+            }
+          }
+
+          resultText += `\n📄 SUMMARY:\n`;
+          resultText += `─────────────────────\n`;
+          resultText += data.summary || 'Advanced testing completed';
+          
+          setResult('single-result', resultText, result.finalDecision === 'PASS');
           
           if (result.screenshot_base64) {
             screenshot.src = `data:image/png;base64,${result.screenshot_base64}`;
             screenshot.classList.add('show');
           }
         } else {
-          resultText = `Review completed for: ${url}\n\n`;
-          if (data.status) {
-            resultText += `Status: ${data.status}\n`;
-          }
-          if (data.metrics) {
-            resultText += `Title: ${data.metrics.title}\n`;
-            resultText += `Content Length: ${data.metrics.contentLength} characters\n`;
-            resultText += `Has Form: ${data.metrics.hasForm ? 'Yes' : 'No'}\n`;
-            resultText += `Has Buttons: ${data.metrics.hasButtons ? 'Yes' : 'No'}\n`;
-          }
-          resultText += `\nHTML Preview:\n${data.html}`;
-          
-          if (data.screenshot_base64) {
-            screenshot.src = `data:image/png;base64,${data.screenshot_base64}`;
-            screenshot.classList.add('show');
-          }
+          setResult('single-result', 'Unexpected response format from server', false);
         }
         
-        setResult('single-result', resultText, true);
         updateProgress('single-progress', 100);
+        updateStatus('single-status', 'Analysis complete!');
         
-        showToast('Website test completed successfully!');
+        showToast('Advanced website analysis completed!');
         loadRecentReviews();
         
       } catch (error) {
         console.error('Single URL test error:', error);
-        setResult('single-result', `Error testing website: ${error.message}`, false);
+        setResult('single-result', `❌ TESTING FAILED\n\nError: ${error.message}\n\nPlease check the URL and try again.`, false);
         showToast('Failed to test website', true);
         updateProgress('single-progress', 0);
+        updateStatus('single-status', 'Test failed');
       } finally {
-        showLoading('single-loading', false);
+        setTimeout(() => {
+          showLoading('single-loading', false);
+        }, 1000);
       }
     }
 
@@ -897,7 +997,7 @@
 
       const invalidUrls = urls.filter(url => !isValidUrl(url));
       if (invalidUrls.length > 0) {
-        showToast(`Invalid URLs found: ${invalidUrls.join(', ')}`, true);
+        showToast(`Invalid URLs found: ${invalidUrls.slice(0, 3).join(', ')}${invalidUrls.length > 3 ? '...' : ''}`, true);
         return;
       }
 
@@ -907,7 +1007,7 @@
       }
 
       if (urls.length > maxSites) {
-        if (!confirm(`You're about to test ${urls.length} websites (max recommended: ${maxSites}). This might take a while. Continue?`)) {
+        if (!confirm(`You're about to test ${urls.length} websites with advanced testing (max recommended: ${maxSites}). This will be very thorough but may take 5-10 minutes. Continue?`)) {
           return;
         }
       }
@@ -915,10 +1015,11 @@
       clearResult('batch-result');
       showLoading('batch-loading', true);
       updateProgress('batch-progress', 5);
-      document.getElementById('batch-status').textContent = `Initializing batch test for ${urls.length} websites...`;
+      updateStatus('batch-status', `Initializing advanced batch analysis for ${urls.length} websites...`);
 
       try {
         updateProgress('batch-progress', 15);
+        updateStatus('batch-status', 'Starting comprehensive testing sequence...');
         
         const response = await fetch('/batch-review', {
           method: 'POST',
@@ -927,7 +1028,7 @@
         });
 
         updateProgress('batch-progress', 30);
-        document.getElementById('batch-status').textContent = 'Processing websites...';
+        updateStatus('batch-status', 'Running advanced tests on all websites...');
 
         if (!response.ok) {
           if (response.status === 429) {
@@ -938,25 +1039,44 @@
         }
 
         updateProgress('batch-progress', 80);
-        document.getElementById('batch-status').textContent = 'Analyzing results...';
+        updateStatus('batch-status', 'Analyzing results and generating reports...');
 
         const data = await response.json();
         updateProgress('batch-progress', 95);
         
         if (data.summary) {
-          let enhancedSummary = data.summary;
-          if (data.enhancedTesting) {
-            enhancedSummary += `\n\nEnhanced Testing Metrics:`;
-            enhancedSummary += `\n• Total Interactions: ${data.stats?.totalInteractions || 0}`;
-            enhancedSummary += `\n• Pages Explored: ${data.stats?.totalPagesVisited || 0}`;
-            enhancedSummary += `\n• Average Content Length: ${data.stats?.avgContentLength || 0} chars`;
-            enhancedSummary += `\n• Success Rate: ${data.stats?.successRate || 0}%`;
-            enhancedSummary += `\n• Deep Navigation: ${deepTest ? 'Enabled' : 'Disabled'}`;
-            enhancedSummary += `\n• Max Depth: ${maxDepth} levels`;
+          let enhancedSummary = `🧪 ADVANCED BATCH ANALYSIS REPORT\n`;
+          enhancedSummary += `═══════════════════════════════════════\n\n`;
+          
+          if (data.stats) {
+            enhancedSummary += `📊 OVERALL RESULTS:\n`;
+            enhancedSummary += `• Total Sites: ${data.stats.total}\n`;
+            enhancedSummary += `• Passed: ${data.stats.passed} (${data.stats.successRate}%)\n`;
+            enhancedSummary += `• Failed: ${data.stats.failed}\n`;
+            enhancedSummary += `• Elements Tested: ${data.stats.totalElementsTested || 0}\n`;
+            enhancedSummary += `• Elements Broken: ${data.stats.totalBrokenElements || 0}\n`;
+            enhancedSummary += `• Element Failure Rate: ${data.stats.elementFailureRate || 0}%\n`;
+            enhancedSummary += `• Pages Explored: ${data.stats.totalPagesVisited || 0}\n`;
+            enhancedSummary += `• Critical Failures: ${data.stats.totalCriticalFailures || 0}\n\n`;
           }
           
-          setResult('batch-result', enhancedSummary, data.stats?.passed > 0);
-          showToast(`Batch test completed! ${data.stats?.passed || 0}/${data.stats?.total || 0} sites passed`);
+          enhancedSummary += `⚙️ TEST CONFIGURATION:\n`;
+          enhancedSummary += `• Advanced Testing: ${data.advancedTesting ? 'Enabled' : 'Disabled'}\n`;
+          enhancedSummary += `• Deep Navigation: ${data.deepTest ? 'Enabled' : 'Disabled'}\n`;
+          enhancedSummary += `• Max Depth: ${maxDepth} levels\n`;
+          enhancedSummary += `• Version: ${data.version || 'v2.0-advanced'}\n\n`;
+          
+          enhancedSummary += `📋 DETAILED RESULTS:\n`;
+          enhancedSummary += `─────────────────────\n`;
+          enhancedSummary += data.summary.replace(/🧪 ADVANCED TESTING SUMMARY:.*?\n/, '');
+          
+          const isSuccess = data.stats && data.stats.successRate >= 80;
+          setResult('batch-result', enhancedSummary, isSuccess);
+          
+          const successMessage = data.stats ? 
+            `Batch analysis complete! ${data.stats.passed}/${data.stats.total} sites passed (${data.stats.successRate}% success rate)` :
+            'Batch analysis completed!';
+          showToast(successMessage);
         } else {
           const text = await response.text();
           setResult('batch-result', text);
@@ -964,19 +1084,19 @@
         }
 
         updateProgress('batch-progress', 100);
-        document.getElementById('batch-status').textContent = 'Analysis complete!';
+        updateStatus('batch-status', 'Advanced analysis complete!');
         loadRecentReviews();
         
       } catch (error) {
         console.error('Batch test error:', error);
-        setResult('batch-result', `Error testing websites: ${error.message}`, false);
+        setResult('batch-result', `❌ BATCH TESTING FAILED\n\nError: ${error.message}\n\nPlease check your URLs and try again.`, false);
         showToast('Failed to test websites', true);
         updateProgress('batch-progress', 0);
-        document.getElementById('batch-status').textContent = 'Analysis failed';
+        updateStatus('batch-status', 'Batch analysis failed');
       } finally {
         setTimeout(() => {
           showLoading('batch-loading', false);
-        }, 1000);
+        }, 2000);
       }
     }
 
@@ -990,13 +1110,12 @@
 
     async function loadRecentReviews() {
       try {
-        const response = await fetch('/api/recent-reviews');
+        const response = await fetch('/api/recent-reviews?limit=50');
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}`);
         }
         
         const data = await response.json();
-
         allReviews = data.reviews || data || [];
         displayReviews(allReviews);
         updateStats();
@@ -1021,18 +1140,27 @@
         return;
       }
 
-      // Filter reviews
       let filteredReviews = reviews;
       if (currentFilter !== 'all') {
         if (currentFilter === 'approved') {
-          filteredReviews = reviews.filter(r => r.review.includes('APPROVED'));
+          filteredReviews = reviews.filter(r => r.review.includes('APPROVED') || r.review.includes('PASSED'));
         } else if (currentFilter === 'denied') {
-          filteredReviews = reviews.filter(r => r.review.includes('DENIED'));
-        } else if (currentFilter === 'enhanced') {
+          filteredReviews = reviews.filter(r => r.review.includes('DENIED') || r.review.includes('FAILED'));
+        } else if (currentFilter === 'advanced') {
           filteredReviews = reviews.filter(r => {
             try {
               const aiResponse = JSON.parse(r.ai_raw_response || '{}');
-              return aiResponse.enhancedTesting === true;
+              return aiResponse.advancedTesting === true || aiResponse.enhancedTesting === true;
+            } catch {
+              return false;
+            }
+          });
+        } else if (currentFilter === 'critical') {
+          filteredReviews = reviews.filter(r => {
+            try {
+              const aiResponse = JSON.parse(r.ai_raw_response || '{}');
+              return (aiResponse.testSummary?.criticalFailures || 0) > 0 || 
+                     (aiResponse.criticalFailures && aiResponse.criticalFailures.length > 0);
             } catch {
               return false;
             }
@@ -1053,20 +1181,21 @@
       list.innerHTML = '';
       filteredReviews.forEach(review => {
         const li = document.createElement('li');
-        const isApproved = review.review.includes('APPROVED');
-        const isDenied = review.review.includes('DENIED');
+        const isApproved = review.review.includes('APPROVED') || review.review.includes('PASSED');
+        const isDenied = review.review.includes('DENIED') || review.review.includes('FAILED');
         
-        let isEnhanced = false;
+        let isAdvanced = false;
+        let testSummary = null;
         let metrics = null;
-        let clickedElements = 0;
-        let visitedPages = 0;
+        let hasCriticalFailures = false;
         
         try {
           const aiResponse = JSON.parse(review.ai_raw_response || '{}');
-          isEnhanced = aiResponse.enhancedTesting === true;
+          isAdvanced = aiResponse.advancedTesting === true || aiResponse.enhancedTesting === true;
+          testSummary = aiResponse.testSummary;
           metrics = aiResponse.metrics;
-          clickedElements = aiResponse.clickedElements || 0;
-          visitedPages = aiResponse.visitedPages || 0;
+          hasCriticalFailures = (aiResponse.testSummary?.criticalFailures || 0) > 0 || 
+                              (aiResponse.criticalFailures && aiResponse.criticalFailures.length > 0);
         } catch (e) {
         }
         
@@ -1077,22 +1206,50 @@
         li.className = className;
         
         let metricsHtml = '';
-        if (isEnhanced && metrics) {
+        if (isAdvanced && (testSummary || metrics)) {
+          metricsHtml = `<div class="review-metrics">`;
+          
+          if (testSummary) {
+            metricsHtml += `<span class="metric advanced-metric">🧪 ${testSummary.testedElements || 0} tested</span>`;
+            if (testSummary.brokenElements > 0) {
+              metricsHtml += `<span class="metric critical-metric">💥 ${testSummary.brokenElements} broken</span>`;
+            }
+            if (testSummary.pagesVisited > 0) {
+              metricsHtml += `<span class="metric advanced-metric">🗺️ ${testSummary.pagesVisited} pages</span>`;
+            }
+            if (testSummary.criticalFailures > 0) {
+              metricsHtml += `<span class="metric critical-metric">🚨 ${testSummary.criticalFailures} critical</span>`;
+            }
+          }
+          
+          if (metrics) {
+            if (metrics.forms > 0) {
+              metricsHtml += `<span class="metric">📝 ${metrics.forms} forms</span>`;
+            }
+            if (metrics.buttons > 0) {
+              metricsHtml += `<span class="metric">🔘 ${metrics.buttons} buttons</span>`;
+            }
+            if (metrics.links > 0) {
+              metricsHtml += `<span class="metric">🔗 ${metrics.links} links</span>`;
+            }
+          }
+          
+          metricsHtml += `</div>`;
+        } else if (metrics) {
           metricsHtml = `
             <div class="review-metrics">
               <span class="metric">📄 ${metrics.paragraphs || 0} paragraphs</span>
               <span class="metric">🔗 ${metrics.links || 0} links</span>
               <span class="metric">📝 ${metrics.forms || 0} forms</span>
-              <span class="metric">🖱️ ${clickedElements} clicks</span>
-              ${visitedPages > 0 ? `<span class="metric">🗺️ ${visitedPages} pages</span>` : ''}
             </div>
           `;
         }
         
-        const enhancedBadge = isEnhanced ? ' ⚡' : '';
+        const advancedBadge = isAdvanced ? ' ⚡' : '';
+        const criticalBadge = hasCriticalFailures ? ' 🚨' : '';
         
         li.innerHTML = `
-          <div class="review-timestamp">${new Date(review.created_at).toLocaleString()}${enhancedBadge}</div>
+          <div class="review-timestamp">${new Date(review.created_at).toLocaleString()}${advancedBadge}${criticalBadge}</div>
           <div class="review-url">${review.url}</div>
           <div class="review-status">${review.review}</div>
           ${metricsHtml}
@@ -1113,28 +1270,48 @@
         const stats = await response.json();
         
         const statsContainer = document.getElementById('stats-container');
-        statsContainer.innerHTML = `
+        let statsHtml = `
           <div class="stat">
             <span class="stat-number">${stats.total}</span>
-            <div class="stat-label">Total</div>
+            <div class="stat-label">Total Tests</div>
           </div>
           <div class="stat">
             <span class="stat-number">${stats.approved}</span>
-            <div class="stat-label">Approved</div>
+            <div class="stat-label">Passed</div>
           </div>
           <div class="stat">
             <span class="stat-number">${stats.denied}</span>
-            <div class="stat-label">Denied</div>
-          </div>
-          <div class="stat">
-            <span class="stat-number">${stats.enhanced}</span>
-            <div class="stat-label">Enhanced</div>
+            <div class="stat-label">Failed</div>
           </div>
           <div class="stat">
             <span class="stat-number">${stats.successRate}%</span>
             <div class="stat-label">Success Rate</div>
           </div>
         `;
+
+        if (stats.totalElementsTested > 0) {
+          statsHtml += `
+            <div class="stat">
+              <span class="stat-number">${stats.totalElementsTested}</span>
+              <div class="stat-label">Elements Tested</div>
+            </div>
+            <div class="stat">
+              <span class="stat-number">${stats.elementFailureRate}%</span>
+              <div class="stat-label">Element Failure Rate</div>
+            </div>
+          `;
+        }
+
+        if (stats.totalCriticalFailures !== undefined) {
+          statsHtml += `
+            <div class="stat">
+              <span class="stat-number">${stats.totalCriticalFailures}</span>
+              <div class="stat-label">Critical Issues</div>
+            </div>
+          `;
+        }
+
+        statsContainer.innerHTML = statsHtml;
         statsContainer.style.display = 'grid';
         
       } catch (error) {
@@ -1150,12 +1327,12 @@
       }
 
       const total = allReviews.length;
-      const approved = allReviews.filter(r => r.review.includes('APPROVED')).length;
-      const denied = allReviews.filter(r => r.review.includes('DENIED')).length;
-      const enhanced = allReviews.filter(r => {
+      const approved = allReviews.filter(r => r.review.includes('APPROVED') || r.review.includes('PASSED')).length;
+      const denied = allReviews.filter(r => r.review.includes('DENIED') || r.review.includes('FAILED')).length;
+      const advanced = allReviews.filter(r => {
         try {
           const aiResponse = JSON.parse(r.ai_raw_response || '{}');
-          return aiResponse.enhancedTesting === true;
+          return aiResponse.advancedTesting === true || aiResponse.enhancedTesting === true;
         } catch {
           return false;
         }
@@ -1166,19 +1343,19 @@
       statsContainer.innerHTML = `
         <div class="stat">
           <span class="stat-number">${total}</span>
-          <div class="stat-label">Total</div>
+          <div class="stat-label">Total Tests</div>
         </div>
         <div class="stat">
           <span class="stat-number">${approved}</span>
-          <div class="stat-label">Approved</div>
+          <div class="stat-label">Passed</div>
         </div>
         <div class="stat">
           <span class="stat-number">${denied}</span>
-          <div class="stat-label">Denied</div>
+          <div class="stat-label">Failed</div>
         </div>
         <div class="stat">
-          <span class="stat-number">${enhanced}</span>
-          <div class="stat-label">Enhanced</div>
+          <span class="stat-number">${advanced}</span>
+          <div class="stat-label">Advanced</div>
         </div>
         <div class="stat">
           <span class="stat-number">${successRate}%</span>
@@ -1190,7 +1367,7 @@
 
     function clearHistory() {
       if (confirm('Are you sure you want to clear all review history? This action cannot be undone.')) {
-        showToast('Clear history feature not implemented yet - contact @Rushmore', true);
+        showToast('Clear history feature requires database admin access - contact support', true);
       }
     }
 
@@ -1208,17 +1385,17 @@
           case '1': filterReviews('all'); break;
           case '2': filterReviews('approved'); break;
           case '3': filterReviews('denied'); break;
-          case '4': filterReviews('enhanced'); break;
+          case '4': filterReviews('advanced'); break;
+          case '5': filterReviews('critical'); break;
         }
       }
     });
 
     setInterval(loadRecentReviews, 30000);
-
     loadRecentReviews();
     setTimeout(() => {
-      showToast('Use enhanced testing for multi page sites! - Made by Rushmore');
-    }, 3000);
+      showToast('Welcome to Striker v2! A much better version.');
+    }, 2000);
   </script>
 </body>
 </html>
