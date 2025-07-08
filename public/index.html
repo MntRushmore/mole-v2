@@ -158,8 +158,8 @@
       background: #338eda;
     }
     
-    .batch-icon {
-      background: #a633d6;
+    .human-icon {
+      background: #f77900;
     }
     
     .card h2 {
@@ -258,6 +258,20 @@
     .feature-highlight strong {
       color: #065f46;
     }
+
+    .human-review-highlight {
+      background: #fef3e2;
+      border: 1px solid #f77900;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      color: #92400e;
+    }
+
+    .human-review-highlight strong {
+      color: #78350f;
+    }
     
     .btn {
       width: 100%;
@@ -286,12 +300,12 @@
     }
     
     .btn-secondary {
-      background: #a633d6;
+      background: #f77900;
       color: white;
     }
     
     .btn-secondary:hover:not(:disabled) {
-      background: #9629c4;
+      background: #e06900;
     }
     
     .loading {
@@ -466,6 +480,7 @@
       background: #f9fafc;
       border-left: 3px solid #e0e6ed;
       font-size: 13px;
+      position: relative;
     }
     
     .review-item.approved {
@@ -476,6 +491,11 @@
     .review-item.denied {
       border-left-color: #ec3750;
       background: #fef2f2;
+    }
+
+    .review-item.human-reviewed {
+      border-left-color: #f77900;
+      background: #fef3e2;
     }
     
     .review-timestamp {
@@ -524,6 +544,12 @@
       border-color: #dc2626;
       color: #991b1b;
     }
+
+    .human-metric {
+      background: #fef3e2;
+      border-color: #f77900;
+      color: #92400e;
+    }
     
     .approved .review-status {
       color: #33d6a6;
@@ -531,6 +557,83 @@
     
     .denied .review-status {
       color: #ec3750;
+    }
+
+    .human-reviewed .review-status {
+      color: #f77900;
+    }
+
+    .review-actions {
+      margin-top: 8px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .review-btn {
+      padding: 4px 8px;
+      border: 1px solid #e0e6ed;
+      background: white;
+      color: #3c4858;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .review-btn:hover {
+      border-color: #338eda;
+      color: #338eda;
+    }
+
+    .review-btn.pass-btn:hover {
+      background: #f0fdf4;
+      border-color: #33d6a6;
+      color: #33d6a6;
+    }
+
+    .review-btn.fail-btn:hover {
+      background: #fef2f2;
+      border-color: #ec3750;
+      color: #ec3750;
+    }
+
+    .human-review-form {
+      display: none;
+      background: #fef3e2;
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 8px;
+      border: 1px solid #f77900;
+    }
+
+    .human-review-form.show {
+      display: block;
+    }
+
+    .human-review-form .form-group {
+      margin-bottom: 8px;
+    }
+
+    .human-review-form .form-label {
+      font-size: 12px;
+      margin-bottom: 2px;
+    }
+
+    .human-review-form .form-textarea {
+      min-height: 60px;
+      font-size: 12px;
+    }
+
+    .human-review-form .form-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .human-review-form .btn {
+      padding: 6px 12px;
+      font-size: 12px;
     }
     
     .toast {
@@ -679,59 +782,39 @@
       
       <div class="card">
         <div class="card-header">
-          <div class="card-icon batch-icon">⚡</div>
-          <h2>Batch Testing</h2>
+          <div class="card-icon human-icon">👤</div>
+          <h2>Reviewer Re-Review</h2>
+        </div>
+
+        <div class="human-review-highlight">
+          <strong>The power of a human:</strong> Review Striker's decisions for denied sites to ensure accuracy and catch false positives.
         </div>
         
         <div class="form-group">
-          <label class="form-label" for="batch-urls">Website URLs (one per line)</label>
-          <textarea id="batch-urls" class="form-textarea" placeholder="https://example1.com&#10;https://example2.com&#10;https://example3.com"></textarea>
+          <label class="form-label">Filter Rejected Sites</label>
+          <select id="human-review-filter" class="form-select" onchange="loadRejectedSites()">
+            <option value="denied">Recently Denied</option>
+            <option value="critical">Critical Failures</option>
+            <option value="advanced">Advanced Test Failures</option>
+          </select>
         </div>
         
         <div class="advanced-options">
-          <h4>Batch Testing Options</h4>
-          <div class="checkbox-group">
-            <input type="checkbox" id="batch-deep-test" checked />
-            <label for="batch-deep-test">Enable advanced testing for all sites</label>
-          </div>
-          <div class="checkbox-group">
-            <input type="checkbox" id="batch-strict-mode" checked />
-            <label for="batch-strict-mode">Strict mode (zero tolerance for failures)</label>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label" for="batch-max-depth">Navigation Depth</label>
-              <select id="batch-max-depth" class="form-select">
-                <option value="1">1 Level</option>
-                <option value="2" selected>2 Levels</option>
-                <option value="3">3 Levels</option>
-                <option value="4">4 Levels</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="batch-max-sites">Max Sites</label>
-              <select id="batch-max-sites" class="form-select">
-                <option value="5" selected>5 Sites</option>
-                <option value="10">10 Sites</option>
-                <option value="20">20 Sites</option>
-              </select>
-            </div>
+          <h4>Review Guidelines</h4>
+          <div style="font-size: 13px; color: #8492a6; line-height: 1.4;">
+            • Check if the AI decision was correct<br>
+            • Look for false positives in critical failures<br>
+            • Verify functionality issues are real<br>
+            • Consider if site works for basic use cases
           </div>
         </div>
         
-        <button class="btn btn-secondary" onclick="submitBatchUrls()">
-          ⚡ Start Batch Analysis
-        </button>
-        
-        <div class="loading" id="batch-loading">
-          <div class="spinner"></div>
-          <span id="batch-status">Initializing advanced batch testing...</span>
-          <div class="progress-bar">
-            <div class="progress-fill" id="batch-progress"></div>
+        <div id="rejected-sites-container">
+          <div class="loading" id="human-review-loading">
+            <div class="spinner"></div>
+            <span>Loading rejected sites for review...</span>
           </div>
         </div>
-        
-        <div class="result" id="batch-result"></div>
       </div>
     </div>
     
@@ -746,6 +829,7 @@
         <button class="filter-tab" onclick="filterReviews('denied')">❌ Failed</button>
         <button class="filter-tab" onclick="filterReviews('advanced')">⚡ Advanced</button>
         <button class="filter-tab" onclick="filterReviews('critical')">🚨 Critical</button>
+        <button class="filter-tab" onclick="filterReviews('human-reviewed')">👤 Human Reviewed</button>
       </div>
       
       <ul class="reviews-list" id="reviews-list">
@@ -767,7 +851,7 @@
         line.textContent = `[${new Date(data.timestamp).toLocaleTimeString()}] ${data.message}`;
         liveLogsDiv.appendChild(line);
         liveLogsDiv.scrollTop = liveLogsDiv.scrollHeight;
-        while (liveLogsDiv.children.length > 100) { // 100 lines max
+        while (liveLogsDiv.children.length > 100) {
           liveLogsDiv.removeChild(liveLogsDiv.firstChild);
         }
       };
@@ -960,6 +1044,7 @@
         
         showToast('Advanced website analysis completed!');
         loadRecentReviews();
+        loadRejectedSites();
         
       } catch (error) {
         console.error('Single URL test error:', error);
@@ -974,130 +1059,164 @@
       }
     }
 
-    async function submitBatchUrls() {
-      const batchInput = document.getElementById('batch-urls');
-      const urlsText = batchInput.value.trim();
-      const deepTest = document.getElementById('batch-deep-test').checked;
-      const maxDepth = parseInt(document.getElementById('batch-max-depth').value);
-      const maxSites = parseInt(document.getElementById('batch-max-sites').value);
+    async function loadRejectedSites() {
+      const filter = document.getElementById('human-review-filter').value;
+      const container = document.getElementById('rejected-sites-container');
+      showLoading('human-review-loading', true);
       
-      if (!urlsText) {
-        showToast('Please enter at least one URL', true);
-        return;
-      }
-
-      const urls = urlsText.split('\n')
-        .map(url => url.trim())
-        .filter(url => url.length > 0);
-
-      if (urls.length === 0) {
-        showToast('No valid URLs found', true);
-        return;
-      }
-
-      const invalidUrls = urls.filter(url => !isValidUrl(url));
-      if (invalidUrls.length > 0) {
-        showToast(`Invalid URLs found: ${invalidUrls.slice(0, 3).join(', ')}${invalidUrls.length > 3 ? '...' : ''}`, true);
-        return;
-      }
-
-      if (urls.length > 20) {
-        showToast('Maximum 20 URLs allowed per batch', true);
-        return;
-      }
-
-      if (urls.length > maxSites) {
-        if (!confirm(`You're about to test ${urls.length} websites with advanced testing (max recommended: ${maxSites}). This will be very thorough but may take 5-10 minutes. Continue?`)) {
-          return;
+      try {
+        const response = await fetch(`/api/recent-reviews?limit=20&filter=${filter}`);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
         }
+        
+        const data = await response.json();
+        const rejectedSites = (data.reviews || []).filter(review => 
+          review.review.includes('DENIED') && !review.review.includes('Human Override')
+        );
+        
+        displayRejectedSites(rejectedSites);
+        
+      } catch (error) {
+        console.error('Failed to load rejected sites:', error);
+        container.innerHTML = '<div class="empty-state"><p>Failed to load rejected sites</p></div>';
+      } finally {
+        showLoading('human-review-loading', false);
+      }
+    }
+
+    function displayRejectedSites(sites) {
+      const container = document.getElementById('rejected-sites-container');
+      
+      if (!sites || sites.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">👍</div>
+            <p>No rejected sites found for review!</p>
+          </div>
+        `;
+        return;
       }
 
-      clearResult('batch-result');
-      showLoading('batch-loading', true);
-      updateProgress('batch-progress', 5);
-      updateStatus('batch-status', `Initializing advanced batch analysis for ${urls.length} websites...`);
+      let html = '';
+      sites.slice(0, 10).forEach(site => {
+        let testSummary = null;
+        let criticalFailures = 0;
+        let aiReason = '';
+        
+        try {
+          const aiData = JSON.parse(site.ai_raw_response || '{}');
+          testSummary = aiData.testSummary;
+          criticalFailures = aiData.testSummary?.criticalFailures || 0;
+          aiReason = aiData.reason || '';
+        } catch (e) {
+        }
+
+        html += `
+          <div class="review-item denied" data-review-id="${site.id}">
+            <div class="review-timestamp">${new Date(site.created_at).toLocaleString()}</div>
+            <div class="review-url">${site.url}</div>
+            <div class="review-status">${site.review}</div>
+            ${testSummary ? `
+              <div class="review-metrics">
+                <span class="metric critical-metric">💥 ${testSummary.brokenElements || 0}/${testSummary.testedElements || 0} broken</span>
+                ${criticalFailures > 0 ? `<span class="metric critical-metric">🚨 ${criticalFailures} critical</span>` : ''}
+                ${testSummary.pagesVisited > 0 ? `<span class="metric">🗺️ ${testSummary.pagesVisited} pages</span>` : ''}
+              </div>
+            ` : ''}
+            <div class="review-actions">
+              <button class="review-btn" onclick="showHumanReviewForm('${site.id}')">👤 Human Review</button>
+              ${site.screenshot_base64 ? `<button class="review-btn" onclick="viewScreenshot('${site.screenshot_base64}')">📸 Screenshot</button>` : ''}
+            </div>
+            <div class="human-review-form" id="form-${site.id}">
+              <div class="form-group">
+                <label class="form-label">Your Decision</label>
+                <select class="form-select" id="decision-${site.id}">
+                  <option value="FAIL">Confirm FAIL - AI was correct</option>
+                  <option value="PASS">Override to PASS - AI was wrong</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Human Review Notes</label>
+                <textarea class="form-textarea" id="notes-${site.id}" placeholder="Explain your decision and reasoning..."></textarea>
+              </div>
+              <div class="form-row">
+                <button class="btn btn-secondary" onclick="submitHumanReview('${site.id}')">Submit Review</button>
+                <button class="btn" onclick="hideHumanReviewForm('${site.id}')" style="background: #e0e6ed;">Cancel</button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function showHumanReviewForm(reviewId) {
+      const form = document.getElementById(`form-${reviewId}`);
+      form.classList.add('show');
+    }
+
+    function hideHumanReviewForm(reviewId) {
+      const form = document.getElementById(`form-${reviewId}`);
+      form.classList.remove('show');
+    }
+
+    async function submitHumanReview(reviewId) {
+      const decision = document.getElementById(`decision-${reviewId}`).value;
+      const notes = document.getElementById(`notes-${reviewId}`).value.trim();
+      
+      if (!notes) {
+        showToast('Please provide review notes', true);
+        return;
+      }
 
       try {
-        updateProgress('batch-progress', 15);
-        updateStatus('batch-status', 'Starting comprehensive testing sequence...');
-        
-        const response = await fetch('/batch-review', {
+        const response = await fetch('/human-review', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ urls, deepTest, maxDepth }),
+          body: JSON.stringify({
+            reviewId,
+            newDecision: decision,
+            humanNotes: notes
+          }),
         });
 
-        updateProgress('batch-progress', 30);
-        updateStatus('batch-status', 'Running advanced tests on all websites...');
-
         if (!response.ok) {
-          if (response.status === 429) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Rate limit exceeded');
-          }
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to submit review');
         }
 
-        updateProgress('batch-progress', 80);
-        updateStatus('batch-status', 'Analyzing results and generating reports...');
-
-        const data = await response.json();
-        updateProgress('batch-progress', 95);
+        const result = await response.json();
+        showToast(`Human review submitted: ${decision}`, false);
         
-        if (data.summary) {
-          let enhancedSummary = `🧪 ADVANCED BATCH ANALYSIS REPORT\n`;
-          enhancedSummary += `═══════════════════════════════════════\n\n`;
-          
-          if (data.stats) {
-            enhancedSummary += `📊 OVERALL RESULTS:\n`;
-            enhancedSummary += `• Total Sites: ${data.stats.total}\n`;
-            enhancedSummary += `• Passed: ${data.stats.passed} (${data.stats.successRate}%)\n`;
-            enhancedSummary += `• Failed: ${data.stats.failed}\n`;
-            enhancedSummary += `• Elements Tested: ${data.stats.totalElementsTested || 0}\n`;
-            enhancedSummary += `• Elements Broken: ${data.stats.totalBrokenElements || 0}\n`;
-            enhancedSummary += `• Element Failure Rate: ${data.stats.elementFailureRate || 0}%\n`;
-            enhancedSummary += `• Pages Explored: ${data.stats.totalPagesVisited || 0}\n`;
-            enhancedSummary += `• Critical Failures: ${data.stats.totalCriticalFailures || 0}\n\n`;
-          }
-          
-          enhancedSummary += `⚙️ TEST CONFIGURATION:\n`;
-          enhancedSummary += `• Advanced Testing: ${data.advancedTesting ? 'Enabled' : 'Disabled'}\n`;
-          enhancedSummary += `• Deep Navigation: ${data.deepTest ? 'Enabled' : 'Disabled'}\n`;
-          enhancedSummary += `• Max Depth: ${maxDepth} levels\n`;
-          enhancedSummary += `• Version: ${data.version || 'v2.0-advanced'}\n\n`;
-          
-          enhancedSummary += `📋 DETAILED RESULTS:\n`;
-          enhancedSummary += `─────────────────────\n`;
-          enhancedSummary += data.summary.replace(/🧪 ADVANCED TESTING SUMMARY:.*?\n/, '');
-          
-          const isSuccess = data.stats && data.stats.successRate >= 80;
-          setResult('batch-result', enhancedSummary, isSuccess);
-          
-          const successMessage = data.stats ? 
-            `Batch analysis complete! ${data.stats.passed}/${data.stats.total} sites passed (${data.stats.successRate}% success rate)` :
-            'Batch analysis completed!';
-          showToast(successMessage);
-        } else {
-          const text = await response.text();
-          setResult('batch-result', text);
-          showToast('Batch test completed!');
-        }
-
-        updateProgress('batch-progress', 100);
-        updateStatus('batch-status', 'Advanced analysis complete!');
+        hideHumanReviewForm(reviewId);
+        loadRejectedSites();
         loadRecentReviews();
         
       } catch (error) {
-        console.error('Batch test error:', error);
-        setResult('batch-result', `❌ BATCH TESTING FAILED\n\nError: ${error.message}\n\nPlease check your URLs and try again.`, false);
-        showToast('Failed to test websites', true);
-        updateProgress('batch-progress', 0);
-        updateStatus('batch-status', 'Batch analysis failed');
-      } finally {
-        setTimeout(() => {
-          showLoading('batch-loading', false);
-        }, 2000);
+        console.error('Human review error:', error);
+        showToast(`Failed to submit review: ${error.message}`, true);
       }
+    }
+
+    function viewScreenshot(base64) {
+      const img = new Image();
+      img.src = `data:image/png;base64,${base64}`;
+      img.style.maxWidth = '90%';
+      img.style.maxHeight = '90%';
+      img.style.border = '1px solid #e0e6ed';
+      img.style.borderRadius = '6px';
+      
+      const modal = document.createElement('div');
+      modal.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.8); display: flex; align-items: center;
+        justify-content: center; z-index: 10000; cursor: pointer;
+      `;
+      modal.appendChild(img);
+      modal.onclick = () => document.body.removeChild(modal);
+      document.body.appendChild(modal);
     }
 
     function filterReviews(filter) {
@@ -1165,6 +1284,8 @@
               return false;
             }
           });
+        } else if (currentFilter === 'human-reviewed') {
+          filteredReviews = reviews.filter(r => r.review.includes('Human Override'));
         }
       }
 
@@ -1183,6 +1304,7 @@
         const li = document.createElement('li');
         const isApproved = review.review.includes('APPROVED') || review.review.includes('PASSED');
         const isDenied = review.review.includes('DENIED') || review.review.includes('FAILED');
+        const isHumanReviewed = review.review.includes('Human Override');
         
         let isAdvanced = false;
         let testSummary = null;
@@ -1200,8 +1322,9 @@
         }
         
         let className = 'review-item';
-        if (isApproved) className += ' approved';
-        if (isDenied) className += ' denied';
+        if (isHumanReviewed) className += ' human-reviewed';
+        else if (isApproved) className += ' approved';
+        else if (isDenied) className += ' denied';
         
         li.className = className;
         
@@ -1233,6 +1356,10 @@
               metricsHtml += `<span class="metric">🔗 ${metrics.links} links</span>`;
             }
           }
+
+          if (isHumanReviewed) {
+            metricsHtml += `<span class="metric human-metric">👤 Human Reviewed</span>`;
+          }
           
           metricsHtml += `</div>`;
         } else if (metrics) {
@@ -1241,15 +1368,23 @@
               <span class="metric">📄 ${metrics.paragraphs || 0} paragraphs</span>
               <span class="metric">🔗 ${metrics.links || 0} links</span>
               <span class="metric">📝 ${metrics.forms || 0} forms</span>
+              ${isHumanReviewed ? '<span class="metric human-metric">👤 Human Reviewed</span>' : ''}
+            </div>
+          `;
+        } else if (isHumanReviewed) {
+          metricsHtml = `
+            <div class="review-metrics">
+              <span class="metric human-metric">👤 Human Reviewed</span>
             </div>
           `;
         }
         
         const advancedBadge = isAdvanced ? ' ⚡' : '';
         const criticalBadge = hasCriticalFailures ? ' 🚨' : '';
+        const humanBadge = isHumanReviewed ? ' 👤' : '';
         
         li.innerHTML = `
-          <div class="review-timestamp">${new Date(review.created_at).toLocaleString()}${advancedBadge}${criticalBadge}</div>
+          <div class="review-timestamp">${new Date(review.created_at).toLocaleString()}${advancedBadge}${criticalBadge}${humanBadge}</div>
           <div class="review-url">${review.url}</div>
           <div class="review-status">${review.review}</div>
           ${metricsHtml}
@@ -1288,6 +1423,15 @@
             <div class="stat-label">Success Rate</div>
           </div>
         `;
+
+        if (stats.humanReviewed !== undefined) {
+          statsHtml += `
+            <div class="stat">
+              <span class="stat-number">${stats.humanReviewed}</span>
+              <div class="stat-label">Human Reviewed</div>
+            </div>
+          `;
+        }
 
         if (stats.totalElementsTested > 0) {
           statsHtml += `
@@ -1337,6 +1481,7 @@
           return false;
         }
       }).length;
+      const humanReviewed = allReviews.filter(r => r.review.includes('Human Override')).length;
       const successRate = total > 0 ? Math.round((approved / total) * 100) : 0;
 
       const statsContainer = document.getElementById('stats-container');
@@ -1354,6 +1499,10 @@
           <div class="stat-label">Failed</div>
         </div>
         <div class="stat">
+          <span class="stat-number">${humanReviewed}</span>
+          <div class="stat-label">Human Reviewed</div>
+        </div>
+        <div class="stat">
           <span class="stat-number">${advanced}</span>
           <div class="stat-label">Advanced</div>
         </div>
@@ -1367,7 +1516,7 @@
 
     function clearHistory() {
       if (confirm('Are you sure you want to clear all review history? This action cannot be undone.')) {
-        showToast('Clear history feature requires database admin access - contact support', true);
+        showToast('Clear history feature requires database admin access - contact @Rushmore', true);
       }
     }
 
@@ -1375,8 +1524,6 @@
       if (e.key === 'Enter' && e.ctrlKey) {
         if (document.activeElement.id === 'url') {
           submitSingleUrl();
-        } else if (document.activeElement.id === 'batch-urls') {
-          submitBatchUrls();
         }
       }
       
@@ -1387,14 +1534,16 @@
           case '3': filterReviews('denied'); break;
           case '4': filterReviews('advanced'); break;
           case '5': filterReviews('critical'); break;
+          case '6': filterReviews('human-reviewed'); break;
         }
       }
     });
 
     setInterval(loadRecentReviews, 30000);
     loadRecentReviews();
+    loadRejectedSites();
     setTimeout(() => {
-      showToast('Welcome to Striker v2! A much better version.');
+      showToast('Striker Launchin...');
     }, 2000);
   </script>
 </body>

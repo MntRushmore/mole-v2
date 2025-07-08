@@ -486,7 +486,7 @@ async function performComprehensiveNavigation(page, baseUrl, failureTracker, max
           unique.push(link);
         }
       }
-      return unique.slice(0, 10); // Limit links per page
+      return unique.slice(0, 10);
     }, baseUrl, Array.from(visitedUrls));
     console.log(`🔗 Found ${links.length} internal links to test`);
     for (const link of links) {
@@ -765,7 +765,7 @@ app.post('/batch-review', rateLimit, async (req, res) => {
           }
           await checkForJavaScriptErrors(page, failureTracker);
           console.log('📱 Testing responsive behavior...');
-          await page.setViewportSize({ width: 375, height: 667 }); // Mobile
+          await page.setViewportSize({ width: 375, height: 667 });
           await page.waitForTimeout(1000);
           const mobileMetrics = await page.evaluate(() => {
             const hasHorizontalScroll = document.body.scrollWidth > window.innerWidth;
@@ -1039,6 +1039,69 @@ app.post('/review', rateLimit, async (req, res) => {
     body: { urls: [url], deepTest: false }
   }, res);
 });
+app.post('/human-review', rateLimit, async (req, res) => {
+  const { reviewId, newDecision, humanNotes } = req.body;
+  if (!reviewId || !newDecision || !humanNotes) {
+    return res.status(400).json({ error: 'Missing required fields: reviewId, newDecision, humanNotes' });
+  }
+  if (!['PASS', 'FAIL'].includes(newDecision)) {
+    return res.status(400).json({ error: 'newDecision must be either PASS or FAIL' });
+  }
+  try {
+    const { data: existingReview, error: fetchError } = await supabase
+      .from('reviews')
+      .select('*')
+      .eq('id', reviewId)
+      .single();
+    if (fetchError || !existingReview) {
+      return res.status(404).json({ error: 'Review not found' });
+    }
+    let aiData = {};
+    try {
+      aiData = JSON.parse(existingReview.ai_raw_response || '{}');
+    } catch (e) {
+      aiData = {};
+    }
+    aiData.humanReview = {
+      originalDecision: aiData.decision || 'UNKNOWN',
+      humanDecision: newDecision,
+      humanNotes,
+      reviewedAt: new Date().toISOString(),
+      reviewedBy: 'human-reviewer'
+    };
+    const newReviewText = newDecision === 'PASS' ? 
+      `APPROVED - Human Override: ${humanNotes}` : 
+      `DENIED - Human Override: ${humanNotes}`;
+    const { error: updateError } = await supabase
+      .from('reviews')
+      .update({
+        review: newReviewText,
+        ai_raw_response: JSON.stringify(aiData),
+        model_used: `${existingReview.model_used}-human-reviewed`
+      })
+      .eq('id', reviewId);
+    if (updateError) {
+      console.error('❌ Database update error:', updateError.message);
+      return res.status(500).json({ error: 'Failed to update review' });
+    }
+    console.log(`👤 Human review completed: ${existingReview.url} - ${newDecision}`);
+    res.json({
+      success: true,
+      message: 'Human review recorded successfully',
+      reviewId,
+      newDecision,
+      humanNotes,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('❌ Human review error:', error);
+    res.status(500).json({
+      error: 'Failed to process human review',
+      details: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
 app.get('/api/recent-reviews', async (req, res) => {
   try {
     const limit = Math.min(parseInt(req.query.limit) || 20, 50);
@@ -1057,6 +1120,8 @@ app.get('/api/recent-reviews', async (req, res) => {
       query = query.ilike('model_used', '%advanced%');
     } else if (filter === 'critical') {
       query = query.ilike('ai_raw_response', '%critical%');
+    } else if (filter === 'human-reviewed') {
+      query = query.ilike('model_used', '%human-reviewed%');
     }
     const { data, error, count } = await query;
     if (error) {
@@ -1071,7 +1136,8 @@ app.get('/api/recent-reviews', async (req, res) => {
           testSummary: aiData.testSummary,
           criticalFailures: aiData.criticalFailures?.length || 0,
           elementsTestedTotal: aiData.testSummary?.testedElements || 0,
-          advancedTesting: aiData.advancedTesting || false
+          advancedTesting: aiData.advancedTesting || false,
+          humanReview: aiData.humanReview || null
         };
       } catch {
         return review;
@@ -1107,6 +1173,7 @@ app.get('/health', (req, res) => {
       humanLikeInteraction: true,
       responsiveDesignTesting: true,
       criticalFailureDetection: true,
+      humanReview: true,
       aiReviews: !!process.env.OPENAI_API_KEY,
       rateLimit: true
     },
@@ -1126,6 +1193,7 @@ app.get('/api/stats', async (req, res) => {
       approved: data.filter(r => r.review.includes('APPROVED')).length,
       denied: data.filter(r => r.review.includes('DENIED')).length,
       advanced: data.filter(r => r.review.includes('Advanced')).length,
+      humanReviewed: data.filter(r => r.review.includes('Human Override')).length,
       last30Days: data.length
     };
     let totalElementsTested = 0;
@@ -1201,6 +1269,7 @@ app.get('/config', (req, res) => {
       humanLikeInteraction: true,
       responsiveDesignTesting: true,
       criticalFailureDetection: true,
+      humanReview: true,
       aiReviews: !!process.env.OPENAI_API_KEY
     }
   });
@@ -1213,6 +1282,7 @@ app.use((req, res) => {
     availableRoutes: [
       'POST /batch-review',
       'POST /review', 
+      'POST /human-review',
       'GET /api/recent-reviews',
       'GET /api/stats',
       'GET /health',
@@ -1239,6 +1309,7 @@ app.listen(PORT, () => {
   console.log(`⚙️ Config: http://localhost:${PORT}/config`);
   console.log(`🧪 Testing Config: Max ${TESTING_CONFIG.MAX_PAGES_TO_TEST} pages, depth ${TESTING_CONFIG.MAX_DEPTH}`);
   console.log(`🤖 AI Reviews: ${process.env.OPENAI_API_KEY ? 'Enabled' : 'Disabled'}`);
+  console.log(`👤 Human Review: Enabled`);
 });
 process.on('SIGTERM', () => {
   console.log('🛑 Received SIGTERM, shutting down gracefully...');
